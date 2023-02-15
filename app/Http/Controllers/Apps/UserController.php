@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Apps;
 
 use App\Http\Controllers\Controller;
+use App\Models\MasterDivision;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -32,14 +33,17 @@ class UserController extends Controller
     public function create()
     {
         $roles = Role::all();
+        $division = MasterDivision::all();
 
         return inertia('Apps/Users/Create', [
             'roles' => $roles,
+            'division'  => $division,
         ]);
     }
 
     public function store(Request $request)
     {
+        // dd($request->division);
         $this->validate($request, [
             'name'      =>  'required',
             'email'     =>  'required|unique:users',
@@ -49,7 +53,8 @@ class UserController extends Controller
         $user = User::create([
             'name'      => $request->name,
             'email'     => $request->email,
-            'password'  => bcrypt($request->password)
+            'password'  => bcrypt($request->password),
+            'division'  => $request->division,
         ]);
 
         $user->assignRole($request->roles);

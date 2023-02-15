@@ -8,7 +8,7 @@
                 <Link href="/apps/master/forms/create" v-if="hasAnyPermission(['form.create'])" class="btn btn-primary input-group-text"> <i class="fa fa-plus-circle me-2"></i> NEW</Link>
             </div>
             <div class="row">
-                <div v-for="form in form_access" :key="form" class="col-md-3 mx-auto card w-32 p-2">
+                <div v-for="form in form_accesses" :key="form" class="col-md-3 mx-auto card w-32 p-2">
                     <div class="card-body">
                         <h5 class="card-title">{{ form.description }}</h5>
                         <Link :href="`/apps/master/forms/${form.name}/show`" class="btn btn-primary btn-sm mt-4">Go Form</Link>
@@ -42,7 +42,7 @@ export default {
     },
 
     props: {
-        form_access: Array
+        form_accesses: Array
     }
 }
 </script>

@@ -20,6 +20,7 @@ class CreateMasterTablesTable extends Migration
             $table->string('description');
             $table->string('is_show',2);
             $table->string('extend',2);
+            $table->string('status',2);
             $table->string('created_by');
             $table->string('updated_by');
             $table->timestamp('created_at')->useCurrent();

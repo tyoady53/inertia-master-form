@@ -54,6 +54,12 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div>
+                                        <label class="fw-bold">Division</label>
+                                        <select class="form-control" v-model="form.division">
+                                            <option v-for="div in division" :key="div" :value="div.id" name="division">{{ div.name }}</option>
+                                        </select>
+                                    </div>
                                     <hr>
                                     <div class="mb-3">
                                         <label class="fw-bold">Role</label>
@@ -64,7 +70,7 @@
                                         </div>
 
                                         <div class="row mt-3">
-                                            <div class="col-12">                                           
+                                            <div class="col-12">
                                                 <button class="btn btn-primary shadow-sm rounded-sm" type="submit">SAVE</button>
                                                 <button class="btn btn-warning shadow-sm rouned-sm ms-3" type="reset">RESET</button>
                                             </div>
@@ -103,7 +109,8 @@
 
         props: {
             errors: Object,
-            roles: Array
+            roles: Array,
+            division:Array,
         },
 
         setup() {
@@ -112,7 +119,8 @@
                 email: '',
                 password: '',
                 password_confirmation: '',
-                roles: []
+                roles: [],
+                division:'',
             });
 
             const submit = () => {
@@ -122,7 +130,8 @@
                     email: form.email,
                     password: form.password,
                     password_confirmation: form.password_confirmation,
-                    roles: form.roles
+                    roles: form.roles,
+                    division: form.division,
                 }, {
                     onSuccess: () => {
                         Swal.fire({
