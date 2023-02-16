@@ -11,7 +11,7 @@
                     <div class="card-body">
                             <form>
                                 <div class="input-group mb-3">
-                                    <Link href="#" class="btn btn-primary input-group-text"> <i class="fa fa-plus-circle me-2"></i> NEW</Link>
+                                    <Link href="/apps/master/tickets/create" class="btn btn-primary input-group-text"> <i class="fa fa-plus-circle me-2"></i> NEW</Link>
                                     <input type="text" class="form-control" placeholder="search by ticket id . . .">
 
                                     <button class="btn btn-primary input-group-text" type="submit"> <i class="fa fa-search me-2"></i> SEARCH</button>

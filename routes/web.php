@@ -77,7 +77,7 @@ Route::prefix('apps')->group(function() {
             });
             Route::prefix('tickets')->group( function() {
                 Route::get('/', [TicketsController::class, 'index'])->name('apps.master.tickets.index');
-
+                Route::get('/create', [TicketsController::class, 'create'])->name('apps.master.tickets.create');
             });
         });
     });

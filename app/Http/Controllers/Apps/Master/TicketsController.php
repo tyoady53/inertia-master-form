@@ -12,4 +12,9 @@ class TicketsController extends Controller
     {
         return Inertia::render('Apps/Tickets/Index');
     }
+
+    public function create()
+    {
+        return Inertia::render('Apps/Tickets/Create');
+    }
 }
