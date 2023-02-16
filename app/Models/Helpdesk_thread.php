@@ -11,4 +11,9 @@ class Helpdesk_thread extends Model
     protected $guarded = [
         'id',
     ];
+
+    public function helpdesk()
+    {
+        return $this->belongsTo(Helpdesk::class);
+    }
 }

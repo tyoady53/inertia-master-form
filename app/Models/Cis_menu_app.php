@@ -11,4 +11,9 @@ class Cis_menu_app extends Model
     protected $guarded = [
         'id',
     ];
+
+    public function helpdesk()
+    {
+        return $this->hasMany(Helpdesk::class);
+    }
 }

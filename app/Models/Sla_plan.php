@@ -11,4 +11,9 @@ class Sla_plan extends Model
     protected $guarded = [
         'id',
     ];
+
+    public function helpdesk()
+    {
+        return $this->hasMany(Helpdesk::class);
+    }
 }
