@@ -3,6 +3,7 @@
 use App\Http\Controllers\Apps\ExtendController;
 use App\Http\Controllers\Apps\Master\FormController;
 use App\Http\Controllers\Apps\Master\ReportController;
+use App\Http\Controllers\Apps\Master\TicketsController;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 
@@ -73,6 +74,10 @@ Route::prefix('apps')->group(function() {
                 Route::get('/{form:slug}/filter', [ReportController::class, 'generate_report'])->name('apps.master.reports.filter');
 
                 Route::get('/{form:slug}/export', [ReportController::class, 'export'])->name('apps.master.reports.export');
+            });
+            Route::prefix('tickets')->group( function() {
+                Route::get('/', [TicketsController::class, 'index'])->name('apps.master.tickets.index');
+
             });
         });
     });
