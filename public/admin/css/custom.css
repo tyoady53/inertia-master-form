@@ -222,3 +222,7 @@ body.modal-open .container {
 .w-32 {
     width: 32%!important;
 }
+
+.text-custom {
+    font-size: 14px;
+}

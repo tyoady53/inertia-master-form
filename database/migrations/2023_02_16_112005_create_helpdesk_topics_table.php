@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->text('topic_name');
             $table->unsignedBigInteger('created_by');
-            $table->unsignedBigInteger('edited_by');
+            $table->unsignedBigInteger('edited_by')->nullable();
             $table->timestamps();
         });
     }

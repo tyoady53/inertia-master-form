@@ -41,4 +41,15 @@ class Helpdesk extends Model
     {
         return $this->belongsTo(Cis_menu_app::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function assign()
+    {
+        return $this->belongsTo(User::class, 'assign_id');
+    }
+
 }

@@ -12,15 +12,15 @@
                             <div class="card-body">
 
                                 <form @submit.prevent="submit">
-
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <label class="fw-bold">Ticket Source *</label>
-                                                <select class="form-select">
-                                                    <option>Phone</option>
-                                                    <option>Email</option>
-                                                    <option>Other</option>
+                                                <select v-model="form.ticket_source" class="form-select">
+                                                    <option disabled value> Choose One</option>
+                                                    <option value="phone">Phone</option>
+                                                    <option value="email">Email</option>
+                                                    <option value="other">Other</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -28,10 +28,9 @@
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <label class="fw-bold">Department</label>
-                                                <select class="form-select">
-                                                    <option>Support</option>
-                                                    <option>Marketing</option>
-                                                    <option>Report</option>
+                                                <select v-model="form.department_id" class="form-select">
+                                                    <option disabled value> Choose One</option>
+                                                    <option v-for="department in departments" :key="department" :value="department.id">{{ department.name }}</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -39,10 +38,9 @@
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <label class="fw-bold">Assign To</label>
-                                                <select class="form-select">
-                                                    <option>Dani</option>
-                                                    <option>Devi</option>
-                                                    <option>Abi</option>
+                                                <select v-model="form.assign_id" class="form-select">
+                                                    <option disabled value> Choose One</option>
+                                                    <option v-for="user in users" :key="user" :value="user.id">{{ user.name }}</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -50,58 +48,115 @@
 
                                     <div class="mb-3">
                                         <label class="fw-bold">Help Topic *</label>
-                                            <select class="form-select">
-                                                    <option>Interfacing</option>
-                                                    <option>Lis Cis Module</option>
-                                                    <option>Lis Reg Key</option>
-                                                    <option>Lis App</option>
-                                                    <option>Report & Data</option>
-                                                    <option>Adjusment Cis Module</option>
-                                                    <option>Other</option>
+                                            <select class="form-select" v-model="form.topic_id">
+                                                <option disabled value> Choose One</option>
+                                                <option v-for="topic in topics" :key="topic" :value="topic.id">{{ topic.topic_name }}</option>
                                             </select>
                                     </div>
-
+ 
                                     <div class="row">
                                         <div class="col-md-8">
                                             <div class="mb-3">
                                                 <label class="fw-bold">SLA PLAN</label>
-                                                <select class="form-select">
-                                                    <option>contoh 1</option>
-                                                    <option>contoh 2</option>
-                                                    <option>contoh 3</option>
-                                                    <option>contoh 4</option>
-                                                    <option>contoh 5</option>
-                                                    <option>contoh 6</option>
-                                                    <option>contoh 7</option>
+                                                <select v-model="form.sla_id" class="form-select">
+                                                    <option disabled value> Choose One</option>
+                                                    <option v-for="sla in sla_plans" :key="sla" :value="sla.id">{{ sla.sla_name }} - ({{ sla.sla_hour }} Hours)</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <label class="fw-bold">DATE</label>
-                                                <input class="form-control" type="datetime-local" placeholder="Date"> 
+                                                <input class="form-control" type="time" placeholder="Date" disabled> 
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label class="fw-bold">Issue Summary *</label>
-                                        <input class="form-control" type="text" rows="4" placeholder="Issue">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="fw-bold">Priority *</label>
+                                                <select v-model="form.priority" class="form-select">
+                                                    <option disabled value> Choose One</option>
+                                                    <option>Low</option>
+                                                    <option>Normal</option>
+                                                    <option>High</option>
+                                                    <option>Emergency</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="fw-bold">Customer *</label>
+                                                <select v-model="form.customer_id" class="form-select">
+                                                    <option disabled value> Choose One</option>
+                                                    <option value="1">Diagnos</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="fw-bold">Branch *</label>
+                                                <select v-model="form.branch_id" class="form-select">
+                                                    <option disabled value> Choose One</option>
+                                                    <option value="1">Margonda</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3" v-if="interfacing">
+                                        <label class="fw-bold">Outlet ID</label>
+                                        <input class="form-control" type="text" v-model="outlet" placeholder="Issue">
+                                    </div>
+
+                                    <div class="mb-3" v-if="interfacing">
+                                        <label class="fw-bold">Section ID</label>
+                                        <input class="form-control" type="text" v-model="section" placeholder="Issue">
+                                    </div>
+
+                                    <div class="mb-3" v-if="interfacing">
+                                        <label class="fw-bold">Section ID</label>
+                                        <input class="form-control" type="text" v-model="section" placeholder="Issue">
+                                    </div>
+
+                                    <div class="mb-3" v-if="interfacing">
+                                        <label class="fw-bold">Section ID</label>
+                                        <input class="form-control" type="text" v-model="section" placeholder="Issue">
+                                    </div>
+
+                                    <div class="mb-3" v-if="interfacing">
+                                        <label class="fw-bold">Section ID</label>
+                                        <input class="form-control" type="text" v-model="section" placeholder="Issue">
+                                    </div>
+
+                                    <div class="mb-3" v-if="interfacing">
+                                        <label class="fw-bold">Section ID</label>
+                                        <input class="form-control" type="text" v-model="section" placeholder="Issue">
+                                    </div>
+
+                                    <div class="mb-3" v-if="interfacing">
+                                        <label class="fw-bold">Section ID</label>
+                                        <input class="form-control" type="text" v-model="section" placeholder="Issue">
+                                    </div>
+
+                                    <div class="mb-3" v-if="module">
+                                        <label class="fw-bold">Tag Module *</label>
+                                            <select class="form-select">
+                                                <option>QMS</option>
+                                                <option>Bridging</option>
+                                                <option>MCU</option>
+                                            </select>
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="fw-bold">Priority *</label>
-                                        <select class="form-select">
-                                            <option>Low</option>
-                                            <option>Normal</option>
-                                            <option>High</option>
-                                            <option>Emergency</option>
-                                        </select>
+                                        <label class="fw-bold">Issue Summary *</label>
+                                        <input v-model="form.title" class="form-control" type="text" rows="4" placeholder="Issue">
                                     </div>
 
                                     <div class="mb-3">
                                         <label class="fw-bold">Issue Details</label>
-                                        <textarea class="form-control" type="text" rows="4" placeholder="Details Description"></textarea>
+                                        <textarea v-model="form.description" class="form-control" type="text" rows="4" placeholder="Details Description"></textarea>
                                     </div>
 
                                     <div class="row">
@@ -126,12 +181,71 @@
 
     import { Head, Link } from '@inertiajs/inertia-vue3';
 
+    import { reactive } from 'vue';
+
+    import { Inertia } from '@inertiajs/inertia';
+
+    import Swal from 'sweetalert2';
+
     export default {
         layout: LayoutApp,
 
         components: {
             Head, Link
         },
+
+        props:{
+            departments: Array,
+            topics: Array,
+            users: Array,
+            sla_plans: Array
+        },
+
+        setup() {
+
+            const form = reactive({
+                ticket_source:  '',
+                department_id:  '',
+                assign_id:      '',
+                topic_id:       '',
+                sla_id: '',
+                priority: '',
+                customer_id: '',
+                branch_id: '',
+                title: '',
+                description: ''
+            });
+
+            const submit = () => {
+                Inertia.post('/apps/master/tickets/store', {
+                    ticket_source:  form.ticket_source,
+                    department_id:  form.department_id,
+                    assign_id:      form.assign_id,
+                    topic_id:       form.topic_id,
+                    sla_id:         form.sla_id,
+                    priority:       form.priority,
+                    customer_id:    form.customer_id,
+                    branch_id:      form.branch_id,
+                    title:          form.title,
+                    description:    form.description
+                }, {
+                    onSuccess: () => {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Ticket saved successfully.',
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    },
+                });
+            }
+            return {
+            form,
+            submit
+        }
+        }
+        
     }
 </script>
 

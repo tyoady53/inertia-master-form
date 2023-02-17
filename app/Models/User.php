@@ -53,6 +53,10 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->getAllPermissions()->mapWithKeys(function($pr){
             return [$pr['name'] => true];
         });
-   
     }
+
+    public function Helpdesk()
+        {
+            return $this->hasMany(Helpdesk::class);
+        }
 }

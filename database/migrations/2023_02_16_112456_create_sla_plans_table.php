@@ -15,10 +15,10 @@ return new class extends Migration
     {
         Schema::create('sla_plans', function (Blueprint $table) {
             $table->id();
-            $table->text('sla_name');
+            $table->string('sla_name');
             $table->integer('sla_hour');
-            $table->unsignedBigInteger('created_at');
-            $table->unsignedBigInteger('edited_by');
+            $table->unsignedBigInteger('created_by');
+            $table->unsignedBigInteger('edited_by')->nullable();
             $table->timestamps();
         });
     }

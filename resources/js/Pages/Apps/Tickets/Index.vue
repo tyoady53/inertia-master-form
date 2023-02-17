@@ -23,35 +23,40 @@
                                     <Link href="#" class="btn btn-primary btn-sm me-2"><i class="fa fa-ticket-alt me-1"></i> CLOSED</Link>
                                 </div>
                             </form>
-                            <table class="table table-striped table-bordered table-hover">
+                            <div style="overflow-x: auto;">
+                            <table class="table table-striped table-bordered table-hover overflow-scroll">
                                 <thead>
                                     <tr>
-                                        <th scope="col">Ticket</th>
-                                        <th scope="col">Date</th>
-                                        <th scope="col">Topic</th>
-                                        <th scope="col">Subject</th>
-                                        <th scope="col">From</th>
-                                        <th scope="col">Priority</th>
-                                        <th scope="col">Assigned To</th>
-                                        <th class="text-center" style="width: 20%;">Action</th>
+                                        <th class="text-center">Ticket</th>
+                                        <th class="text-center">Date</th>
+                                        <th class="text-center" scope="col" style="min-width: 100px;">Topic</th>
+                                        <th class="text-center">Customer</th>
+                                        <th class="text-center">Branch</th>
+                                        <th class="text-center">Subject</th>
+                                        <th class="text-center">From</th>
+                                        <th class="text-center">Priority</th>
+                                        <th class="text-center" scope="col" style="width: 12%;">Assigned To</th>
+                                        <!-- <th class="text-center" style="width: 10%;">Action</th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td class="text-center">
-                                            <Link href="#" class="btn btn-success btn-sm me-2"><i class="fa fa-pencil-alt me-1"></i> EDIT</Link>
-                                            <button class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> DELETE</button>
-                                        </td>
+                                    <tr v-for="d in data" :key="d">
+                                        <td class="text-custom">{{ d.thread_id }}</td>
+                                        <td class="text-custom">{{ d.ticket_date }}</td>
+                                        <td class="text-custom">{{ d.topic.topic_name }}</td>
+                                        <td class="text-custom">{{ d.customer_id }}</td>
+                                        <td class="text-custom">{{ d.branch_id }}</td>
+                                        <td class="text-custom">{{ d.title }}</td>
+                                        <td class="text-custom">{{ d.user.name }}</td>
+                                        <td class="text-custom">{{ d.priority }}</td>
+                                        <td class="text-custom">{{ d.assign.name }}</td>
+                                        <!-- <td class="text-center text-custom">
+                                            <Link href="#" class="text-custom btn btn-success btn-sm me-2"><i class="fa fa-pencil-alt me-1"></i> OPEN</Link>
+                                        </td> -->
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
                         </div>
                 </div>
             </div>
@@ -71,6 +76,11 @@
         components: {
             Head, Link
         },
+
+        props: {
+            data: Array
+        }
+        
     }
 </script>
 
