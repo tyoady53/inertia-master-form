@@ -413,8 +413,8 @@ export default {
         assignSelector: -1,
         selectedAssign: -1,
         create_ticket : false,
-    }), 
-    
+    }),
+
     methods: {
         currentDate() {
             console.log(this.today);

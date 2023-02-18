@@ -24,7 +24,7 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <label class="fw-bold">Department</label>
@@ -48,8 +48,9 @@
 
                                     <div class="mb-3">
                                         <label class="fw-bold">Help Topic *</label>
-                                            <select class="form-select" v-model="form.topic_id">
+                                            <select class="form-select" v-model="topic_id" @change="changeTopics">
                                                 <option disabled value> Choose One</option>
+                                                <!-- <option value="interfacing">Interfacing</option> -->
                                                 <option v-for="topic in topics" :key="topic" :value="topic.id">{{ topic.topic_name }}</option>
                                             </select>
                                     </div>
@@ -67,7 +68,7 @@
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <label class="fw-bold">DATE</label>
-                                                <input class="form-control" type="time" placeholder="Date" disabled> 
+                                                <input class="form-control" type="time" placeholder="Date" disabled>
                                             </div>
                                         </div>
                                     </div>
@@ -105,37 +106,17 @@
                                         </div>
                                     </div>
 
-                                    <div class="mb-3" v-if="interfacing">
+                                    <div class="mb-3" v-if="interfacing == 1">
                                         <label class="fw-bold">Outlet ID</label>
                                         <input class="form-control" type="text" v-model="outlet" placeholder="Issue">
                                     </div>
 
-                                    <div class="mb-3" v-if="interfacing">
+                                    <div class="mb-3" v-if="interfacing == 1">
                                         <label class="fw-bold">Section ID</label>
                                         <input class="form-control" type="text" v-model="section" placeholder="Issue">
                                     </div>
 
-                                    <div class="mb-3" v-if="interfacing">
-                                        <label class="fw-bold">Section ID</label>
-                                        <input class="form-control" type="text" v-model="section" placeholder="Issue">
-                                    </div>
-
-                                    <div class="mb-3" v-if="interfacing">
-                                        <label class="fw-bold">Section ID</label>
-                                        <input class="form-control" type="text" v-model="section" placeholder="Issue">
-                                    </div>
-
-                                    <div class="mb-3" v-if="interfacing">
-                                        <label class="fw-bold">Section ID</label>
-                                        <input class="form-control" type="text" v-model="section" placeholder="Issue">
-                                    </div>
-
-                                    <div class="mb-3" v-if="interfacing">
-                                        <label class="fw-bold">Section ID</label>
-                                        <input class="form-control" type="text" v-model="section" placeholder="Issue">
-                                    </div>
-
-                                    <div class="mb-3" v-if="interfacing">
+                                    <div class="mb-3" v-if="interfacing == 3">
                                         <label class="fw-bold">Section ID</label>
                                         <input class="form-control" type="text" v-model="section" placeholder="Issue">
                                     </div>
@@ -199,6 +180,32 @@
             topics: Array,
             users: Array,
             sla_plans: Array
+        },
+
+        data: () => ({
+            interfacing: '',
+        }),
+
+        methods:{
+            changeTopics() {
+                // for(let i = 0 ; i < topics.length ; i++) {
+                //     let structures = this.topics[i];
+                //     if(structures['id'] == this.topic_id) {
+                //         const a = structures['topic_name'];
+                //         console.log(a)
+                //         if(a.toLowerCase().includes('interfacing')) {
+                //             this.interfacing = true;
+                //         } else {
+                //             this.interfacing = false;
+                //         }
+                //     }
+                // }
+                if(this.topic_id) {
+                    this.interfacing = this.topic_id;
+                } else {
+                    this.interfacing = false;
+                }
+            },
         },
 
         setup() {
