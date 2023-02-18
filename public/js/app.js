@@ -21481,10 +21481,6 @@ __webpack_require__.r(__webpack_exports__);
   components: {
     Link: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_0__.Link
   }
-
-  // props: {
-
-  // }
 });
 
 /***/ }),
