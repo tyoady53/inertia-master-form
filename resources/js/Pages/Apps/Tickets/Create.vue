@@ -205,7 +205,7 @@
                 } else {
                     this.interfacing = false;
                 }
-            },
+            }, 
         },
 
         setup() {
