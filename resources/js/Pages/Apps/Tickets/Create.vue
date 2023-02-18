@@ -28,9 +28,9 @@
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <label class="fw-bold">Department</label>
-                                                <select v-model="form.department_id" class="form-select">
+                                                <select v-model="form.department_id" class="form-select" @change="getUser">
                                                     <option disabled value> Choose One</option>
-                                                    <option v-for="department in departments" :key="department" :value="department.id">{{ department.name }}</option>
+                                                    <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -40,7 +40,7 @@
                                                 <label class="fw-bold">Assign To</label>
                                                 <select v-model="form.assign_id" class="form-select">
                                                     <option disabled value> Choose One</option>
-                                                    <option v-for="user in users" :key="user" :value="user.id">{{ user.name }}</option>
+                                                    <option v-for="user in users" :key="user.id" :value="user.id">{{ user.name }}</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -48,7 +48,7 @@
 
                                     <div class="mb-3">
                                         <label class="fw-bold">Help Topic *</label>
-                                            <select class="form-select" v-model="form.topic_id">
+                                            <select class="form-select" v-model="topic_id">
                                                 <option disabled value> Choose One</option>
                                                 <option v-for="topic in topics" :key="topic" :value="topic.id">{{ topic.topic_name }}</option>
                                             </select>
@@ -105,49 +105,16 @@
                                         </div>
                                     </div>
 
-                                    <div class="mb-3" v-if="interfacing">
-                                        <label class="fw-bold">Outlet ID</label>
-                                        <input class="form-control" type="text" v-model="outlet" placeholder="Issue">
+                                    <div class="mb-3" v-if="topic">
+                                        <label class="fw-bold">1 ID</label>
+                                        <input class="form-control" type="text" placeholder="Issue">
                                     </div>
 
-                                    <div class="mb-3" v-if="interfacing">
-                                        <label class="fw-bold">Section ID</label>
-                                        <input class="form-control" type="text" v-model="section" placeholder="Issue">
+                                    <div class="mb-3">
+                                        <label class="fw-bold">2 ID</label>
+                                        <input class="form-control" type="text" placeholder="Issue">
                                     </div>
-
-                                    <div class="mb-3" v-if="interfacing">
-                                        <label class="fw-bold">Section ID</label>
-                                        <input class="form-control" type="text" v-model="section" placeholder="Issue">
-                                    </div>
-
-                                    <div class="mb-3" v-if="interfacing">
-                                        <label class="fw-bold">Section ID</label>
-                                        <input class="form-control" type="text" v-model="section" placeholder="Issue">
-                                    </div>
-
-                                    <div class="mb-3" v-if="interfacing">
-                                        <label class="fw-bold">Section ID</label>
-                                        <input class="form-control" type="text" v-model="section" placeholder="Issue">
-                                    </div>
-
-                                    <div class="mb-3" v-if="interfacing">
-                                        <label class="fw-bold">Section ID</label>
-                                        <input class="form-control" type="text" v-model="section" placeholder="Issue">
-                                    </div>
-
-                                    <div class="mb-3" v-if="interfacing">
-                                        <label class="fw-bold">Section ID</label>
-                                        <input class="form-control" type="text" v-model="section" placeholder="Issue">
-                                    </div>
-
-                                    <div class="mb-3" v-if="module">
-                                        <label class="fw-bold">Tag Module *</label>
-                                            <select class="form-select">
-                                                <option>QMS</option>
-                                                <option>Bridging</option>
-                                                <option>MCU</option>
-                                            </select>
-                                    </div>
+                                    
 
                                     <div class="mb-3">
                                         <label class="fw-bold">Issue Summary *</label>
@@ -181,11 +148,13 @@
 
     import { Head, Link } from '@inertiajs/inertia-vue3';
 
-    import { reactive } from 'vue';
+    import { onMounted, reactive, ref, watch } from 'vue';
 
     import { Inertia } from '@inertiajs/inertia';
 
     import Swal from 'sweetalert2';
+
+    import axios from 'axios';
 
     export default {
         layout: LayoutApp,
@@ -195,13 +164,23 @@
         },
 
         props:{
-            departments: Array,
+            // departments: Array,
             topics: Array,
-            users: Array,
+            // users: Array,
             sla_plans: Array
         },
 
-        setup() {
+        setup(props) {
+
+            const departments = ref({})
+
+            const users = ref({
+                getUser: false,
+            })
+
+            const selectedTopic = ref({
+                topic_id: ''
+            })
 
             const form = reactive({
                 ticket_source:  '',
@@ -216,6 +195,30 @@
                 description: ''
             });
 
+            onMounted(() => {
+
+            axios.get(`http://localhost:8000/api/deparments`).then(response => {
+                departments.value = response.data.data
+                })
+                .catch(error => {
+                    console.log(error.response.data)
+                })
+
+            })
+            
+            function getUser() {
+                axios.post(`http://localhost:8000/api/user`,{
+                    id: form.department_id,
+                }).then(response => {
+                    users.value = response.data.data
+                }).then(() => {
+                    this.users.getUser = true
+                })
+                .catch(error => {
+                    console.log(error.response.data)
+                })
+            }
+            
             const submit = () => {
                 Inertia.post('/apps/master/tickets/store', {
                     ticket_source:  form.ticket_source,
@@ -242,6 +245,9 @@
             }
             return {
             form,
+            departments,
+            users,
+            getUser,
             submit
         }
         }

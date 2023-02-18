@@ -84,5 +84,30 @@ class TicketsController extends Controller
             'description' => $request->description
         ]);
 
+        return redirect()->route('apps.master.tickets.index');
+    }
+
+    public function getDepartments()
+    {
+        $departments = MasterDivision::get();
+
+        return response()->json([
+            'success'   => true,
+            'message'   => 'Get All Departments',
+            'data'      => $departments
+        ]);
+    }
+
+    public function getUser(Request $request)
+    {
+        $departments = MasterDivision::where('id', $request->id)->first();
+
+        $users = User::where('division', $request->id)->get();
+
+        return response()->json([
+            'success'   => true,
+            'message'   =>'List Data City By Province : '.$departments->name.'',
+            'data'      => $users
+        ]);
     }
 }
