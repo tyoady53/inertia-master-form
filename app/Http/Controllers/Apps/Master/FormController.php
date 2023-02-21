@@ -11,6 +11,8 @@ use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use App\Models\master_table_structure;
 use App\Models\MasterAssignment;
+use App\Models\MasterCustomer;
+use App\Models\MasterCustomerBranch;
 use App\Models\MasterParentChild;
 use App\Models\MasterTable;
 use App\Models\PublicModel;
@@ -20,6 +22,7 @@ class FormController extends Controller
 {
    public function index()
     {
+        // dd(MasterCustomerBranch::where('customer_id','35')->with('customer_name')->get());
         $a = array();
         if(auth()){
             $user_id = auth()->user()->id;
