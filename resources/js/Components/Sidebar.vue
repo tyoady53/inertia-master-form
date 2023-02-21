@@ -82,10 +82,6 @@
         components: {
             Link
         }
-
-        // props: {
-            
-        // }
     }
 </script>
 
