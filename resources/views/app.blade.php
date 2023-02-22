@@ -15,6 +15,8 @@
     <script src="{{ mix('/js/app.js') }}" defer></script>
     <script src="https://unpkg.com/v-switch-case@1.0.2/dist/v-switch.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.21/vue.js"></script>
+    <script src="https://cdn.tiny.cloud/1/ea203bddi6yf1k9559rtu52qcnp2flk8w0ryijna3k3z0etc/tinymce/6/tinymce.min.js"></script>
+    
   </head>
   <body>
     {{-- {{ url() }} --}}

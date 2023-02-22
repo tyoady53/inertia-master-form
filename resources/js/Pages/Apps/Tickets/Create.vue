@@ -114,7 +114,6 @@
                                         <label class="fw-bold">2 ID</label>
                                         <input class="form-control" type="text" placeholder="Issue">
                                     </div>
-                                    
 
                                     <div class="mb-3">
                                         <label class="fw-bold">Issue Summary *</label>

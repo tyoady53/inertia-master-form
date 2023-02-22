@@ -225,7 +225,7 @@
                                                                     <div v-if="header.relate_to.split('#')[0] == index">
                                                                         <label class="fw-bold">{{ header.field_description }}</label>
                                                                         <select class="form-control" :name="header.field_name" v-model="selectedChainIds" @change="onChangeChain(header.input_type.split('#')[1])" :required="header.required == 'required'">
-                                                                            <option v-for="p in parent">{{ p[header.relate_to.split('#')[1]] }}</option>
+                                                                            <option v-for="p in parent" :value="p.id">{{ p[header.relate_to.split('#')[1]] }}</option>
                                                                         </select>
                                                                     </div>
                                                                 </div>
@@ -301,7 +301,7 @@
                                                                     <div v-if="header.relate_to.split('#')[0] == index">
                                                                         <label class="fw-bold">{{ header.field_description }}</label>
                                                                         <select class="form-control" :name="header.field_name" v-model="selectedChainIds" @change="onChangeChain(header.input_type.split('#')[1])" :required="header.required == 'required'">
-                                                                            <option v-for="p in parent">{{ p[header.relate_to.split('#')[1]] }}</option>
+                                                                            <option v-for="p in parent" :value="p.id">{{ p[header.relate_to.split('#')[1]] }}</option>
                                                                         </select>
                                                                     </div>
                                                                 </div>
@@ -403,6 +403,17 @@
 </template>
 
 <script>
+tinymce.init({
+    selector: 'textarea',
+    plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss',
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+    tinycomments_mode: 'embedded',
+    tinycomments_author: 'Author name',
+    mergetags_list: [
+    { value: 'First.Name', title: 'First Name' },
+    { value: 'Email', title: 'Email' },
+    ]
+});
 import LayoutApp from '../../../Layouts/App.vue';
 
 import { Head, Link } from '@inertiajs/inertia-vue3';
@@ -512,7 +523,7 @@ export default {
         let filteredsubChains = [];
         for(let i = 0 ; i < this.child_data.length ; i++) {
             let structures = this.child_data[i];
-            if(structures[parent] == this.selectedChainIds) {
+            if(structures.customernamebyid == this.selectedChainIds) {
                 filteredsubChains.push(structures);
             }
         }
