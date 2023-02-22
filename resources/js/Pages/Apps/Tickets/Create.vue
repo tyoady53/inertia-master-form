@@ -48,13 +48,12 @@
 
                                     <div class="mb-3">
                                         <label class="fw-bold">Help Topic *</label>
-                                            <select class="form-select" v-model="topic_id" @change="changeTopics">
+                                            <select class="form-select" v-model="topic_id">
                                                 <option disabled value> Choose One</option>
-                                                <!-- <option value="interfacing">Interfacing</option> -->
                                                 <option v-for="topic in topics" :key="topic" :value="topic.id">{{ topic.topic_name }}</option>
                                             </select>
                                     </div>
-
+ 
                                     <div class="row">
                                         <div class="col-md-8">
                                             <div class="mb-3">
@@ -68,7 +67,7 @@
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <label class="fw-bold">DATE</label>
-                                                <input class="form-control" type="time" placeholder="Date" disabled>
+                                                <input class="form-control" type="time" placeholder="Date" disabled> 
                                             </div>
                                         </div>
                                     </div>
@@ -105,29 +104,17 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="mb-3" v-if="interfacing == 1">
-                                        <label class="fw-bold">Outlet ID</label>
-                                        <input class="form-control" type="text" v-model="outlet" placeholder="Issue">
+
+                                    <div class="mb-3" v-if="topic">
+                                        <label class="fw-bold">1 ID</label>
+                                        <input class="form-control" type="text" placeholder="Issue">
                                     </div>
 
-                                    <div class="mb-3" v-if="interfacing == 1">
-                                        <label class="fw-bold">Section ID</label>
-                                        <input class="form-control" type="text" v-model="section" placeholder="Issue">
+                                    <div class="mb-3">
+                                        <label class="fw-bold">2 ID</label>
+                                        <input class="form-control" type="text" placeholder="Issue">
                                     </div>
-
-                                    <div class="mb-3" v-if="interfacing == 3">
-                                        <label class="fw-bold">Section ID</label>
-                                        <input class="form-control" type="text" v-model="section" placeholder="Issue">
-                                    </div>
-
-                                    <div class="mb-3" v-if="module">
-                                        <label class="fw-bold">Tag Module *</label>
-                                            <select class="form-select">
-                                                <option>QMS</option>
-                                                <option>Bridging</option>
-                                                <option>MCU</option>
-                                            </select>
-                                    </div>
+                                    
 
                                     <div class="mb-3">
                                         <label class="fw-bold">Issue Summary *</label>
@@ -183,33 +170,19 @@
             sla_plans: Array
         },
 
-        data: () => ({
-            interfacing: '',
-        }),
+        setup(props) {
 
-        methods:{
-            changeTopics() {
-                // for(let i = 0 ; i < topics.length ; i++) {
-                //     let structures = this.topics[i];
-                //     if(structures['id'] == this.topic_id) {
-                //         const a = structures['topic_name'];
-                //         console.log(a)
-                //         if(a.toLowerCase().includes('interfacing')) {
-                //             this.interfacing = true;
-                //         } else {
-                //             this.interfacing = false;
-                //         }
-                //     }
-                // }
-                if(this.topic_id) {
-                    this.interfacing = this.topic_id;
-                } else {
-                    this.interfacing = false;
-                }
-            }, 
-        },
+            var UrlOrigin = window.location.origin;
 
-        setup() {
+            const departments = ref({})
+
+            const users = ref({
+                getUser: false,
+            })
+
+            const selectedTopic = ref({
+                topic_id: ''
+            })
 
             const form = reactive({
                 ticket_source:  '',
@@ -221,12 +194,12 @@
                 customer_id: '',
                 branch_id: '',
                 title: '',
-                description: ''
+                description: '',
             });
 
             onMounted(() => {
 
-            axios.get(`http://localhost:8000/api/deparments`).then(response => {
+            axios.get(UrlOrigin+`/api/deparments`).then(response => {
                 departments.value = response.data.data
                 })
                 .catch(error => {
@@ -236,7 +209,7 @@
             })
 
             function getUser() {
-                axios.post(`http://localhost:8000/api/user`,{
+                axios.post(UrlOrigin+`/api/user`,{
                     id: form.department_id,
                 }).then(response => {
                     users.value = response.data.data
@@ -247,7 +220,7 @@
                     console.log(error.response.data)
                 })
             }
-
+            
             const submit = () => {
                 Inertia.post('/apps/master/tickets/store', {
                     ticket_source:  form.ticket_source,
@@ -280,7 +253,7 @@
             submit
         }
         }
-
+        
     }
 </script>
 
