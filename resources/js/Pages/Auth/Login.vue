@@ -101,7 +101,6 @@
 
             //submit method
             const submit = () => {
-
                 //send data to server
                 Inertia.post('/login', {
 

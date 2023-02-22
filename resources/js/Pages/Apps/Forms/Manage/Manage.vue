@@ -40,12 +40,12 @@
                                 <br><br>
                                 <table class="table table-striped table-bordered table-hover">
                                     <thead>
-                                        <th class="text-center">Field Name</th> <th class="text-center"> Relation </th><th class="text-center"> Input Type </th><th class="text-center">Action</th>
+                                        <th class="text-center">Field Name</th> <th class="text-center"> Relation </th> <th class="text-center"> Sequence </th> <th class="text-center"> Input Type </th> <th class="text-center">Action</th>
                                     </thead>
                                     <tbody>
                                         <tr v-for="header in headers">
                                             <td> {{ header.field_description }}</td>
-                                            <td v-if="header.relation === '0'"> 
+                                            <td v-if="header.relation === '0'">
                                                 <div v-if="header.input_type.split('#')[0] === 'Parent'">Parent</div>
                                                 <div v-else-if="header.input_type.split('#')[0] === 'Child'">Child</div>
                                                 <div v-else>. .</div>
@@ -58,8 +58,8 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <!--  -->
                                             </td>
+                                            <td> <input type="number" name="_token" :value="header.sequence_id"> </td>
                                             <td> {{ header.input_type }} <br>
                                                 <button class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#datatypeModal" @click="changeType(header)"> <i class="fa fa-link   me-1"></i> Change Data Type</button>
                                             </td>

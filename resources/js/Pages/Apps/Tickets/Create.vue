@@ -24,7 +24,7 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <label class="fw-bold">Department</label>
@@ -322,7 +322,7 @@
             },
         },
 
-        setup() {
+        setup(props) {
 
             const departments = ref({})
 
@@ -344,17 +344,12 @@
                 customer_id: '',
                 branch_id: '',
                 title: '',
-                description: '',
-                outlet_id: '',
-                analyzer_name: '',
-                hid: '',
-                cable_length: '',
-                additional_com: '',
+                description: ''
             });
 
             onMounted(() => {
 
-            axios.get(`http://localhost:8000/api/deparments`).then(response => {
+            axios.get(UrlOrigin+`/api/deparments`).then(response => {
                 departments.value = response.data.data
                 })
                 .catch(error => {
@@ -362,9 +357,9 @@
                 })
 
             })
-            
+
             function getUser() {
-                axios.post(`http://localhost:8000/api/user`,{
+                axios.post(UrlOrigin+`/api/user`,{
                     id: form.department_id,
                 }).then(response => {
                     users.value = response.data.data

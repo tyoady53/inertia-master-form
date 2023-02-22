@@ -70,6 +70,7 @@ class ExtendController extends Controller
     {
         $select = DB::table('master_tables')->where('name',$name)->first();
         $data   = Extend::create(['table_id'=>$select->id,'index_id'=>$id,'description'=>$request->description,'created_by'=>auth()->user()->id]);
+        $insert = DB::statement("UPDATE $name SET status_report = '$request->status_report' WHERE index_id='$id';");
 
         if($data){
             return redirect()->route('apps.master.forms.extend_index',[$name,$id]);

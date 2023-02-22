@@ -49,7 +49,7 @@ class ReportController extends Controller
             $user_id = auth()->user()->id;
         }
         $user = User::where('id',$user_id)->first();
-        $select_field = 'id,';$form = '';
+        $select_field = '';$form = '';
         $select = DB::table('master_tables')->where('name',$name)->first();
         $table_name = $select->description;
         $title  = DB::table('master_table_structures')->where('table_id',$select->id)->where('is_show',1)->get();
@@ -62,7 +62,7 @@ class ReportController extends Controller
         $selected_data = array();
         if ($title->count() > 0){
 			foreach ($title as $index => $t){
-				$select_field .= $t->field_name.',';
+				$select_field .= 'id,'.$t->field_name.',';
 			}
 			$selected = substr($select_field, 0,-1);
             $form = DB::table($name)->selectRaw($selected)->where('status','1')->get();
@@ -73,7 +73,6 @@ class ReportController extends Controller
             $selected_data[$head->field_name] = DB::table($name)->distinct()->get($head->field_name);
         }
         return Inertia::render('Apps/Reports/Show', [
-            'group'         => DB::table('master_tablegroup')->get(),
             'table'         => $name,
             'user_role'     => strtolower($user->getRoleNames()),
             'user_id'       => $user_id,
@@ -85,7 +84,7 @@ class ReportController extends Controller
             'forms'         => $form,
             'selected'      => $selected_data,
         ]);
-    }     
+    }
 
     public function generate_report(Request $request, $name)
     {
@@ -218,7 +217,7 @@ class ReportController extends Controller
         }
         // dd($request);
         $query = "SELECT * FROM users JOIN $name ON users.id = $name.created_by WHERE $name.`status` = 1 $a $b $date_filter;"; // the query selector
-        
+
         return Excel::download(new FilterExport([
             'table_name'    => $table_name,
             'headers'       => $header,

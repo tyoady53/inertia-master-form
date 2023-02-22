@@ -11,6 +11,9 @@ use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use App\Models\master_table_structure;
 use App\Models\MasterAssignment;
+use App\Models\MasterCustomer;
+use App\Models\MasterCustomerBranch;
+use App\Models\MasterParentChild;
 use App\Models\MasterTable;
 use App\Models\PublicModel;
 use Spatie\Permission\Models\Permission;
@@ -19,6 +22,7 @@ class FormController extends Controller
 {
    public function index()
     {
+        // dd(MasterCustomerBranch::where('customer_id','35')->with('customer_name')->get());
         $a = array();
         if(auth()){
             $user_id = auth()->user()->id;
@@ -39,7 +43,6 @@ class FormController extends Controller
         }
         $select_val = substr($e,0,-1);
         $select_val .= ')';
-        // dd(DB::table('master_tables')->whereIn('name',$a)->get());
         if($a){
             $form_access = DB::table('master_tables')->whereIn('name',$a)->get();
         }else{
@@ -61,7 +64,6 @@ class FormController extends Controller
 
     public function create_form(Request $request)
     {
-        // dd($request);
         $user_id = auth()->user()->id;
         $carbon         = Carbon::now();
         $table_name     = str_replace(array(' ', '-', ',', '.', '/'),'',strtolower($request->name));
@@ -97,7 +99,6 @@ class FormController extends Controller
         ]);
         $query ="CREATE TABLE $table_name (".$base."PRIMARY KEY (`id`) USING BTREE)ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
         DB::statement($query);
-        // DB::insert("INSERT INTO master_tables (`group`, `name`, `description`,`is_show`,`created_by`,`updated_by`) VALUES ('$group_name','$table_name','$request->name','1','$user_id','$user_id')");
 
         $input_index    = Permission::create(['name' => $index,   'guard_name' => 'web']);
         $input_create   = Permission::create(['name' => $create,  'guard_name' => 'web']);
@@ -139,6 +140,7 @@ class FormController extends Controller
         $table_name = $request->table;
         $data_type      = DB::table('master_datatype')->where('name',$request->data_type)->first();
         $table_selected = DB::table('master_tables')->where('name',$table_name)->first();
+        $master_table_structure = master_table_structure::where('is_show','1')->orderBy('sequence_id','DESC')->first();
         $structure = new master_table_structure;
         $structure->table_id            = $table_selected->id;
         $structure->field_name          = $field_name;
@@ -148,6 +150,7 @@ class FormController extends Controller
         $structure->field_name          = $field_name;
         $structure->relation            = '0';
         $structure->input_type          = $request->data_type;
+        $structure->sequence_id         = $master_table_structure->sequence_id + 1;
         $structure->relate_to           = $relate_to;
         $structure->created_by          = auth()->user()->id;
         $structure->save();
@@ -169,7 +172,7 @@ class FormController extends Controller
 		$table			= $request->table;
 		$field_name		= $request->field_from;
 		$relate_to_table= $request->relate_table;
-        // dd($relate_to_table);
+
 		$relate_to_field= $request->refer_to;
         $select = DB::table('master_tables')->where('name',$table)->first();
         $select2 = DB::table('master_tables')->where('id',$relate_to_table)->first();
@@ -193,16 +196,37 @@ class FormController extends Controller
 		$field_name		    = $request->field_name;
 		$child              = $request->child;
 		$data_from_table    = $request->data_from_table;
-		$parent_reference   = $request->parent_reference;
+		$parent_references  = $request->parent_reference;
 		$child_data         = $request->child_data;
         $child_reference    = master_table_structure::where('id', $child_data)->first();
-        $parent_reference   = master_table_structure::where('id', $parent_reference)->first();
+        $parent_reference   = master_table_structure::where('id', $parent_references)->first();
         $select_table       = DB::table('master_tables')->where('name',$table)->first();
         $table_data         = DB::table('master_tables')->where('id',$data_from_table)->first();
-        $child_input    = 'Child#'.$field_name;
-        $parent_input   = 'Parent#'.$child;
-        $child_relate   = $table_data->name.'#'.$child_reference->field_name;
-        $parent_relate  = $table_data->name.'#'.$parent_reference->field_name;
+        $parent_table       = DB::table('master_table_structures')->where('table_id',$parent_reference->table_id)->where('relation','1')->first();
+        $parent_related     = DB::table('master_relation')->where('field_from',$parent_reference->field_name)->where('table_name_from',$table_data->name)->first();
+        $child_input    = 'Child#'.$child_reference->field_name;
+        $parent_input   = 'Parent#'.$parent_reference->field_name;
+        $base_child     = 'C.'.$select_table->id.'.'.$child_reference->table_id;
+        $base_parent    = 'P.'.$select_table->id.'.'.$child_reference->table_id;
+        $parent_lastindex = DB::table('master_table_structures')->whereRaw('LEFT(relate_to,'.strlen($base_parent).') = "'.$base_parent.'"')->orderByRaw('RIGHT(SUBSTRING_INDEX(relate_to,"#", 1),1)')->first();
+        if($parent_lastindex){
+            $input_indexP = $base_parent.'.'.(int)explode('.',$parent_lastindex->relate_to)[3]+1;
+        } else {
+            $input_indexP = $base_parent.'.1';
+        }
+        $child_lastindex = DB::table('master_table_structures')->whereRaw('LEFT(relate_to,'.strlen($base_child).') = "'.$base_child.'"')->orderByRaw('RIGHT(SUBSTRING_INDEX(relate_to,"#", 1),1)')->first();
+        if($child_lastindex){
+            $input_indexC = $base_child.'.'.(int)explode('.',$child_lastindex->relate_to)[3]+1;
+        } else {
+            $input_indexC = $base_child.'.1';
+        }
+        if($parent_table){
+            $parent_relate  = $input_indexP.'#'.$parent_related->refer_to;
+        } else {
+            $parent_relate  = $input_indexP.'#'.$parent_reference->field_name;
+        }
+        $child_relate   = $input_indexC.'#'.$child_reference->field_name;
+
         $child_save = master_table_structure::where('field_name', $child)->where('table_id',$select_table->id) //update to selected child
                 ->update([
                     'input_type'    => $child_input,
@@ -213,6 +237,8 @@ class FormController extends Controller
                     'input_type'    => $parent_input,
                     'relate_to'     => $parent_relate
             ]);
+        MasterParentChild::create(['index_id' => $input_indexP,   'relate_to' => $table_data->name, 'field_name' => $parent_reference->field_name]);
+        MasterParentChild::create(['index_id' => $input_indexC,   'relate_to' => $table_data->name, 'field_name' => $child_reference->field_name]);
 		if($child_save){
 			return redirect()->route('apps.master.forms.manage',$table);
 		}
@@ -248,29 +274,58 @@ class FormController extends Controller
         $table_name = $select->description;
         $title  = DB::table('master_table_structures')->where('table_id',$select->id)->where('is_show',1)->get();
         $relation = $public_model->get_table_single_filter('master_relation','table_name_from',$name); //DB::table('master_relation')->where('table_name_from',$name)->get();
-        $header = $public_model->get_table_structure_by_table_id($select->id);//DB::table('master_table_structures')->where('table_id',$select->id)->where('is_show',1)->get();
+        $header = DB::table('master_table_structures')->where('table_id',$select->id)->where('is_show',1)->orderBy('sequence_id','asc')->get();
         if ($title->count() > 0){
 			foreach ($title as $index => $t){
                 $select_field .= $t->field_name.',';
                 if($select->status){
                     $select_field .= 'status_report,';
                 }
+                // if($t->relate_to != ''){
+                //     if(str_contains($t->input_type, 'Child')){
+                //         $relations = $t->relate_to;
+                //         $relate_table = explode('#',$relations);
+                //         $field_check = $relate_table[1];
+                //         $check_data = DB::table($relate_table[0])->get();
+                //         foreach ($check_data as $chk_data){
+                //             $child[$t->input_type][$field_check] = $check_data;
+                //         }
+                //     } else if (str_contains($t->input_type, 'Parent')){
+                //         $relations = $t->relate_to;
+                //         $relate_table = explode('#',$relations);
+                //         $field_check = $relate_table[1];
+                //         $check_data = DB::table($relate_table[0])->distinct()->get([$field_check]);
+                //         foreach ($check_data as $chk_data){
+                //             $parent[$t->input_type][$field_check] = $check_data;
+                //         }
+                //     } else {
+                //         $relations = $t->relate_to;
+                //         $relate_table = explode('#',$relations);
+                //         $field_check = $relate_table[1];
+                //         $check_data = DB::table($relate_table[0])->get([$field_check]);
+                //         foreach ($check_data as $chk_data){
+                //             $table_to_check[$t->input_type][$field_check] = $check_data;
+                //         }
+                //     }
+                // }
                 if($t->relate_to != ''){
                     if(str_contains($t->input_type, 'Child')){
-                        $relations = $t->relate_to;
-                        $relate_table = explode('#',$relations);
-                        $field_check = $relate_table[1];
-                        $check_data = DB::table($relate_table[0])->get();
-                        foreach ($check_data as $chk_data){
-                            $child[$t->input_type][$field_check] = $check_data;
+                        $relate_table = DB::table('master_parent_child')->where('index_id',explode('#',$t->relate_to)[0])->first();
+                        // $field_check = $relate_table;
+                        if($relate_table){
+                            $check_data = DB::table($relate_table->relate_to)->get();
+                            foreach ($check_data as $chk_data){
+                                $child[$t->input_type][$relate_table->field_name] = $check_data;
+                            }
                         }
                     } else if (str_contains($t->input_type, 'Parent')){
-                        $relations = $t->relate_to;
-                        $relate_table = explode('#',$relations);
-                        $field_check = $relate_table[1];
-                        $check_data = DB::table($relate_table[0])->distinct()->get([$field_check]);
-                        foreach ($check_data as $chk_data){
-                            $parent[$t->input_type][$field_check] = $check_data;
+                        $relate_table = DB::table('master_parent_child')->where('index_id',explode('#',$t->relate_to)[0])->first();
+                        // $field_check = $relate_table;
+                        if($relate_table){
+                            $check_data = DB::table($relate_table->relate_to)->get();
+                            foreach ($check_data as $chk_data){
+                                $parent[$t->input_type][$relate_table->field_name] = $check_data;
+                            }
                         }
                     } else {
                         $relations = $t->relate_to;
@@ -319,15 +374,31 @@ class FormController extends Controller
         }
         foreach ($header as $he){
             if(str_contains($he->input_type, 'Parent')){
-                $parent_count = +1;
-                $parent_data = DB::table(explode('#', $he->relate_to)[0])->select(explode('#', $he->relate_to)[1])->distinct()->get();
-                $child_data  = DB::table(explode('#', $he->relate_to)[0])->get();
+                $relate_table = DB::table('master_parent_child')->where('index_id',explode('#',$he->relate_to)[0])->first();
+                $data = explode('#',$he->relate_to)[0];
+                $table_reference_id = explode('.',$data)[2];
+                $table_reference_name = DB::table('master_tables')->where('id',$table_reference_id)->first();
+                $reference_structure = DB::table('master_table_structures')->where('table_id',$table_reference_id)->get();
+                if($public_model->get_table_single_filter('master_relation','table_name_from',$table_reference_name->name)->count() > 0){
+                    foreach ($reference_structure as $chk_data){
+                        $m = DB::table('master_relation')->where('table_name_from',$relate_table->relate_to)->get();
+                        foreach($m as $n){
+                            $z = $n->table_name_to;
+                            $parent_data = [$data => DB::table($z)->get()];
+                        }
+                    }
+                } else {
+                    $parent_data = [$data => DB::table($relate_table->relate_to)->groupBy($relate_table->field_name)->get()];
+                }
+            }
+            if(str_contains($he->input_type, 'Child')){
+                $relate_table = DB::table('master_parent_child')->where('index_id',explode('#',$he->relate_to)[0])->first();
+                $child_data  = DB::table($relate_table->relate_to)->get();
             }
             if(str_contains($he->input_type, 'Checklist')){
                 $checklist_data[explode('#',$he->relate_to)[0]] = [explode('#',$he->relate_to)[0] => $public_model->get_all_table_data(explode('#',$he->relate_to)[0])/*DB::table(explode('#',$he->relate_to)[0])->get()*/,"field_from" => explode('#',$he->relate_to)[1]];
             }
         }
-        // dd($parent_data, $child_data,);
         $field  = DB::table('master_datatype')->get();
         $show_table  = DB::table('master_tables')->where('is_show',1)->get();
         $structures  = DB::table('master_table_structures')->where('is_show',1)->get();
@@ -387,7 +458,6 @@ class FormController extends Controller
                             'status_report' => $select->status,
                             'select_status' => DB::table('master_status_report')->orderBy('id','ASC')->get(),
                             'divisions'     => DB::table('master_divisions')->where('id','!=','1')->where('id','!=',auth()->user()->division)->get(),
-                            // 'divisions'     => DB::table('master_divisions')->select('division')->groupBy('division')->where('division','!=',auth()->user()->division)->get(),
                             'users'         => DB::table('users')->where('id','!=',auth()->user()->id)->get(),
                         ]);
                         break;
@@ -462,6 +532,11 @@ class FormController extends Controller
                     $vehicleString = implode(",", $request->$fields);
                     $values .= "'".$vehicleString."',";
                 }
+            } else if (str_contains($t->input_type, 'Parent')){
+                $select = explode('#',$t->input_type)[1];
+                $relate_table = DB::table('master_parent_child')->where('index_id',explode('#',$t->relate_to)[0])->first();
+                $parent_data = DB::table($relate_table->relate_to)->where($select,$request->$fields)->first();
+                $values .= "'".$parent_data->id."',";
             } else {
                 $values .= "'".$request->$fields."',";
             }
@@ -472,20 +547,17 @@ class FormController extends Controller
         }
         $selected = substr($select_field, 0,-1);
         $insert_value = substr($values, 0,-1);
-
+        // dd("INSERT INTO $table ($selected) VALUES ($insert_value)");
 		$insert = DB::statement("INSERT INTO $table ($selected) VALUES ($insert_value);");
         if($request->assignSelector){
             if($request->assignSelector == 'division'){
                 $get_user = User::where('division', $request->assign_to)->get();
                 foreach($get_user as $user){
-                    // $m .= $user->id;
                     MasterAssignment::create(['index_id' => $generated,   'user_id' => $user->id]);
                 }
-                // dd($m);
             } else if ($request->assignSelector == 'staff'){
                 MasterAssignment::create(['index_id' => $generated,   'user_id' => $request->assign_to]);
             }
-            // dd('this is selector');
         }
 		if($insert){
 			return redirect()->route('apps.master.forms.show',$table);
@@ -527,7 +599,6 @@ class FormController extends Controller
     }
 
     public function delete_data($name,$id){
-        // dd($name,$id);
 		$table_head		= DB::statement("DELETE FROM $name WHERE id='$id';");
 		$table_head		= DB::statement("UPDATE $name SET status='0' WHERE id='$id';");
         if($table_head){

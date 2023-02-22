@@ -40,7 +40,38 @@
                                                     {{ form.index_id }}
                                                 </td>
                                                 <td v-for="header in headers" :key="header">
-                                                    {{ form[header.field_name]  }}
+                                                    <div v-if="header.input_type.split('#')[0] === 'Parent'">
+                                                        <div v-for="parent,index in parentData">
+                                                            <div v-if="header.relate_to.split('#')[0] == index">
+                                                                <div v-for="p in parent">
+                                                                    <div v-if="p.id == form[header.field_name]">
+                                                                        {{ p[header.relate_to.split('#')[1]] }}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div v-else-if="header.input_type.split('#')[0] === 'Child'">
+                                                        <div v-for="child in child_data">
+                                                            <div v-if="form[header.field_name] == child.id">
+                                                                {{ child[header.relate_to.split('#')[1]] }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div v-else-if="header.relation === '1'">
+                                                        <div v-for="rel,index in related[0]" :key="rel">
+                                                            <div v-if="relation[0].refer_to ==  index">
+                                                                <div v-for="r in rel" :key="r">
+                                                                    <div v-if="r.id == form[header.field_name]">
+                                                                        {{ r[index] }}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div v-else>
+                                                        {{ form[header.field_name]  }}
+                                                    </div>
                                                 </td>
                                                 <td class="text-center" v-if="status_report == '1'">{{ form.status_report }}</td>
                                                 <td v-if="extend == '1'" class="text-center">
@@ -102,7 +133,7 @@
 
                                     <!-- Modal Header -->
                                     <div class="modal-header">
-                                        <h4 class="modal-title">Add Data : {{ table_name }}</h4>
+                                        <h4 class="modal-title">Add Data : {{ table_name }} {{ relate }}</h4>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <!-- Modal body -->
@@ -120,7 +151,7 @@
                                                                     <div v-if="rel.field_from == header.field_name">
                                                                         <label class="fw-bold">{{ header.field_description }}</label>
                                                                         <select class="form-control" :name="header.field_name" :required="header.required == 'required'">
-                                                                            <option v-for="option in rel[header.field_name]" :value="option[header.field_name]">{{option[rel_data.refer_to]}}</option>
+                                                                            <option v-for="option in rel[header.field_name]" :value="option.id">{{option[rel_data.refer_to]}}</option>
                                                                         </select>
                                                                     </div>
                                                                 </div>
@@ -190,18 +221,20 @@
                                                         </div>
                                                         <div v-else-if="header.input_type.includes('#')">
                                                             <div v-if="header.input_type.split('#')[0] === 'Parent'">
-                                                                <label class="fw-bold">{{ header.field_description }}</label>
-                                                                <div class="mb-3">
-                                                                    <select class="form-control" :name="header.field_name" v-model="selectedChainIds" @change="onChangeChain(header.relate_to.split('#')[1])" :required="header.required == 'required'">
-                                                                        <option v-for="parent in parentData">{{ parent[header.relate_to.split('#')[1]] }}</option>
-                                                                    </select>
+                                                                <div v-for="parent,index in parentData">
+                                                                    <div v-if="header.relate_to.split('#')[0] == index">
+                                                                        <label class="fw-bold">{{ header.field_description }}</label>
+                                                                        <select class="form-control" :name="header.field_name" v-model="selectedChainIds" @change="onChangeChain(header.input_type.split('#')[1])" :required="header.required == 'required'">
+                                                                            <option v-for="p in parent">{{ p[header.relate_to.split('#')[1]] }}</option>
+                                                                        </select>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div v-else-if="header.input_type.split('#')[0] === 'Child'">
                                                                 <div  v-if="filteredChain.length">
                                                                     <label class="fw-bold">{{ header.field_description }}</label>
                                                                     <select class="form-control" :name="header.field_name" v-model="selectedSubChainIds" :required="header.required == 'required'">
-                                                                        <option v-for="chain in filteredChain">{{ chain[header.relate_to.split('#')[1]] }}</option>
+                                                                        <option v-for="chain in filteredChain" :value="chain.id">{{ chain[header.relate_to.split('#')[1]] }}</option>
                                                                     </select>
                                                                 </div>
                                                             </div>
@@ -254,7 +287,7 @@
                                                                                 {{check[header.relate_to.split('#')[1]]}}
                                                                             </td>
                                                                             <td class="text-center">
-                                                                                <input type="checkbox" :name="header.field_name+'[]'" :value="check[header.relate_to.split('#')[1]]" :required="header.required == 'required'">
+                                                                                <input type="checkbox" :name="header.field_name+'[]'" :value="check[header.input_type.split('#')[1]]" :required="header.required == 'required'">
                                                                             </td>
                                                                         </tr>
                                                                     </tbody>
@@ -263,19 +296,26 @@
                                                         </div>
                                                     </div>
                                                     <div v-else-if="header.input_type.includes('#')">
-                                                        <div v-if="header.input_type.split('#')[0] === 'Parent'">
-                                                            <label class="fw-bold">{{ header.field_description }}</label>
-                                                            <div class="mb-3">
+                                                            <div v-if="header.input_type.split('#')[0] === 'Parent'">
+                                                                <div v-for="parent,index in parentData">
+                                                                    <div v-if="header.relate_to.split('#')[0] == index">
+                                                                        <label class="fw-bold">{{ header.field_description }}</label>
+                                                                        <select class="form-control" :name="header.field_name" v-model="selectedChainIds" @change="onChangeChain(header.input_type.split('#')[1])" :required="header.required == 'required'">
+                                                                            <option v-for="p in parent">{{ p[header.relate_to.split('#')[1]] }}</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!-- <div class="mb-3">
                                                                 <select class="form-control" :name="header.field_name" v-model="selectedChainIds" @change="onChangeChain(header.relate_to.split('#')[1])" :required="header.required == 'required'">
                                                                     <option v-for="parent in parentData">{{ parent[header.relate_to.split('#')[1]] }}</option>
                                                                 </select>
-                                                            </div>
-                                                        </div>
+                                                            </div> -->
                                                         <div v-else-if="header.input_type.split('#')[0] === 'Child'">
                                                             <div  v-if="filteredChain.length">
                                                                 <label class="fw-bold">{{ header.field_description }}</label>
                                                                 <select class="form-control" :name="header.field_name" v-model="selectedSubChainIds" :required="header.required == 'required'">
-                                                                    <option v-for="chain in filteredChain">{{ chain[header.relate_to.split('#')[1]] }}</option>
+                                                                    <option v-for="chain in filteredChain" :value="chain.id">{{ chain[header.relate_to.split('#')[1]] }}</option>
                                                                 </select>
                                                             </div>
                                                         </div>
@@ -413,8 +453,8 @@ export default {
         assignSelector: -1,
         selectedAssign: -1,
         create_ticket : false,
-    }), 
-    
+    }),
+
     methods: {
         currentDate() {
             console.log(this.today);
