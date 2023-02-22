@@ -114,9 +114,7 @@
                                         <label class="fw-bold">Section ID</label>
                                         <input class="form-control" type="text" placeholder="Issue">
                                     </div>
-<<<<<<< HEAD
-=======
-                                    
+
                                     <div class="mb-3" v-if="filter == 1">
                                         <label class="fw-bold">Analyzer Name</label>
                                         <input v-model="form.analyzer_name" class="form-control" type="text" placeholder="Issue">
@@ -225,7 +223,6 @@
                                                 <option v-for="menu in cis_menu_app" :key="menu">{{ menu.app_name }}</option>
                                             </select>
                                     </div>
->>>>>>> 01ca7719d39399009f8afb7a06f8d06527025a78
 
                                     <div class="mb-3">
                                         <label class="fw-bold">Issue Summary *</label>
