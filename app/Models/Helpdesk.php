@@ -52,4 +52,9 @@ class Helpdesk extends Model
         return $this->belongsTo(User::class, 'assign_id');
     }
 
+    public function division()
+    {
+        return $this->belongsTo(MasterDivision::class, 'departement_id');
+    }
+
 }

@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Apps\Master;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cis_menu_app;
 use App\Models\Helpdesk;
 use App\Models\Helpdesk_topic;
+use App\Models\Lis_cis_module;
+use App\Models\Lis_menu_app;
 use App\Models\MasterDivision;
 use App\Models\Sla_plan;
 use App\Models\User;
@@ -29,18 +32,25 @@ class TicketsController extends Controller
         $users = User::where('id', '!=', auth()->user()->id)->get();
         $topics = Helpdesk_topic::get();
         $sla_plans = Sla_plan::get();
+        $tag_modules = Lis_cis_module::get();
+        $lis_menu_tags = Lis_menu_app::get();
+        $cis_menu_apps = Cis_menu_app::get();
 
         return Inertia::render('Apps/Tickets/Create', [
             'departments' => $departments,
             'topics'    => $topics,
             'users'     => $users,
-            'sla_plans' => $sla_plans
+            'sla_plans' => $sla_plans,
+            'tag_modules' => $tag_modules,
+            'lis_menu_app'  => $lis_menu_tags,
+            'cis_menu_app'  => $cis_menu_apps
         ]);
     }
 
     public function store(Request $request)
     {
 
+        // dd($request);
         $this->validate($request, [
             'department_id' => 'required',
             'assign_id' => 'required',
@@ -63,7 +73,7 @@ class TicketsController extends Controller
                 $generated = $last_data->index_id+1;
             }
         } else {
-            $generated = date("ym").'0001';
+            $generated = date("ym").'0001' + 1;
         }
 
             Helpdesk::create([
@@ -81,7 +91,14 @@ class TicketsController extends Controller
             'customer_id' => $request->customer_id,
             'branch_id' => $request->branch_id,
             'title' => $request->title,
-            'description' => $request->description
+            'description' => $request->description,
+            'outlet_id' => $request->outlet_id,
+            // 'out_name'  => $request->out_name,
+            'analyzer_name' => $request->analyzer_name,
+            'hid'   => $request->hid,
+            'cable_length'  => $request->cable_length,
+            'additional_com'    => $request->additional_com,
+
         ]);
 
         return redirect()->route('apps.master.tickets.index');
@@ -109,5 +126,18 @@ class TicketsController extends Controller
             'message'   =>'List Data City By Province : '.$departments->name.'',
             'data'      => $users
         ]);
+    }
+
+    public function show($thread_id) 
+    {
+
+        // dd($thread_id);
+        $thread = Helpdesk::with('user', 'topic', 'assign', 'sla', 'division')->where('thread_id', $thread_id)->first();
+        // $helpdesk = Helpdesk::get();
+
+        return Inertia::render('Apps/Tickets/Thread', [
+            'data' => $thread,
+            // 'helpdesks' => $helpdesk,
+        ]); 
     }
 }

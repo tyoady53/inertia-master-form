@@ -31,6 +31,8 @@ return new class extends Migration
             $table->enum('status', ['open', 'closed']);
             $table->string('outlet_id')->nullable(); //optional
             $table->string('out_name')->nullable(); //optional
+            $table->string('section_id')->nullable();
+            $table->string('analyer_id')->nullable();
             $table->string('analyzer_name')->nullable(); //optional
             $table->string('hid')->nullable(); //optional
             $table->string('cable_length')->nullable(); //optional

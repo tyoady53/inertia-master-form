@@ -48,12 +48,12 @@
 
                                     <div class="mb-3">
                                         <label class="fw-bold">Help Topic *</label>
-                                            <select class="form-select" v-model="topic_id">
+                                            <select class="form-select" v-model="form.topic_id" @change="changeTopics">
                                                 <option disabled value> Choose One</option>
                                                 <option v-for="topic in topics" :key="topic" :value="topic.id">{{ topic.topic_name }}</option>
                                             </select>
                                     </div>
- 
+
                                     <div class="row">
                                         <div class="col-md-8">
                                             <div class="mb-3">
@@ -105,16 +105,124 @@
                                         </div>
                                     </div>
 
-                                    <div class="mb-3" v-if="topic">
-                                        <label class="fw-bold">1 ID</label>
-                                        <input class="form-control" type="text" placeholder="Issue">
+                                    <div class="mb-3" v-if="filter == 1">
+                                        <label class="fw-bold">Outlet ID</label>
+                                        <input v-model="form.outlet_id" class="form-control" type="text" placeholder="Issue">
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label class="fw-bold">2 ID</label>
+                                    <div class="mb-3" v-if="filter == 1">
+                                        <label class="fw-bold">Section ID</label>
                                         <input class="form-control" type="text" placeholder="Issue">
                                     </div>
                                     
+                                    <div class="mb-3" v-if="filter == 1">
+                                        <label class="fw-bold">Analyzer Name</label>
+                                        <input v-model="form.analyzer_name" class="form-control" type="text" placeholder="Issue">
+                                    </div>
+
+                                    <div class="mb-3" v-if="filter == 1">
+                                        <label class="fw-bold">Analyzer ID</label>
+                                        <input class="form-control" type="text" placeholder="Issue">
+                                    </div>
+
+                                    <div class="mb-3" v-if="filter == 1">
+                                        <label class="fw-bold">HID</label>
+                                        <input v-model="form.hid" class="form-control" type="text" placeholder="Issue">
+                                    </div>
+
+                                    <div class="mb-3" v-if="filter == 1">
+                                        <label class="fw-bold">Cable Length</label>
+                                        <input v-model="form.cable_length" class="form-control" type="text" placeholder="Issue">
+                                    </div>
+
+                                    <div class="mb-3" v-if="filter == 1">
+                                        <label class="fw-bold">Additional com</label>
+                                        <input v-model="form.additional_com" class="form-control" type="text" placeholder="Issue">
+                                    </div>
+
+                                    <!-- LIS CIS MODULES -->
+                                    <div class="mb-3" v-if="filter == 2">
+                                        <label class="fw-bold">Tag Module *</label>
+                                            <select v-model="form.tag_module_id" class="form-select">
+                                                <option disabled value> Choose One</option>
+                                                <option v-for="module in tag_modules" :key="module" :value="module.id">{{ module.module_name }}</option>
+                                            </select>
+                                    </div>
+
+                                    <!-- Reg Key -->
+                                    <div class="mb-3" v-if="filter == 3">
+                                        <label class="fw-bold">Outlet ID</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="mb-3" v-if="filter == 3">
+                                        <label class="fw-bold">Outlet Name</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="mb-3" v-if="filter == 3">
+                                        <label class="fw-bold">Reason For Request</label>
+                                        <textarea class="form-control" type="text" rows="4" placeholder="Details Description"></textarea>
+                                    </div>
+
+                                    <!-- Report And Data -->
+                                    <div class="mb-3" v-if="report">
+                                        <label class="fw-bold">Request Type</label>
+                                        <option>New</option>
+                                        <option>Edit</option>
+                                    </div>
+
+                                    <div class="mb-3" v-if="report">
+                                        <label class="fw-bold">Report ID</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="mb-3" v-if="report">
+                                        <label class="fw-bold">Report Name</label>
+                                        <textarea type="text" class="form-control" rows="3"></textarea>
+                                    </div>
+
+                                    <div class="mb-3" v-if="report">
+                                        <label class="fw-bold">PKG</label>
+                                        <textarea type="text" class="form-control" rows="3"></textarea>
+                                    </div>
+
+                                    <div class="mb-3" v-if="report">
+                                        <label class="fw-bold">Report Type</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="mb-3" v-if="report">
+                                        <label class="fw-bold">Report Date</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="mb-3" v-if="report">
+                                        <label class="fw-bold">Purpose</label>
+                                        <textarea type="text" class="form-control" rows="3"></textarea>
+                                    </div>
+
+                                    <div class="mb-3" v-if="report">
+                                        <label class="fw-bold">Data Displayed</label>
+                                        <textarea type="text" class="form-control" rows="3"></textarea>
+                                    </div>
+
+                                    <div class="mb-3" v-if="report">
+                                        <label class="fw-bold">Lis Menu Tag</label>
+                                            <select class="form-select">
+                                                <option disabled value> Choose One</option>
+                                                <option v-for="menu in lis_menu_app" :key="menu">{{ menu.app_name }}</option>
+                                            </select>
+                                    </div>
+
+                                    <!-- CIS APP -->
+                                    <div class="mb-3" v-if="cis">
+                                        <label class="fw-bold">Lis Menu Tag</label>
+                                            <select class="form-select">
+                                                <option disabled value> Choose One</option>
+                                                <option v-for="menu in cis_menu_app" :key="menu">{{ menu.app_name }}</option>
+                                            </select>
+                                    </div>
 
                                     <div class="mb-3">
                                         <label class="fw-bold">Issue Summary *</label>
@@ -123,7 +231,24 @@
 
                                     <div class="mb-3">
                                         <label class="fw-bold">Issue Details</label>
-                                        <textarea v-model="form.description" class="form-control" type="text" rows="4" placeholder="Details Description"></textarea>
+                                        <Editor id="file-picker"
+                                            api-key="no-api-key"
+                                            v-model="form.description"
+                                            :init="{
+                                                menubar: insert,
+                                                plugins: 'lists link image code emoticons print preview paste importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars',
+                                                image_title: true,
+                                                automatic_upload: true,
+                                                paste_data_images: true, 
+                                                // image_advtab: true,
+                                                imagetools_cors_hosts: ['picsum.photos'],
+                                                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image | code | emoticons |',
+                                                // image_list: [
+                                                // {title: 'My image 1', value: 'https://www.example.com/my1.gif'},
+                                                // {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}]
+                                            }"
+                                            >
+                                            <p><img style="display: block; margin-left: auto; margin-right: auto;" title="Tiny Logo" src="{{ data.description }}" alt="TinyMCE Logo" width="128" height="128" /></p></Editor>
                                     </div>
 
                                     <div class="row">
@@ -144,6 +269,8 @@
 </template>
 
 <script>
+
+
     import LayoutApp from '../../../Layouts/App.vue';
 
     import { Head, Link } from '@inertiajs/inertia-vue3';
@@ -151,6 +278,8 @@
     import { onMounted, reactive, ref, watch } from 'vue';
 
     import { Inertia } from '@inertiajs/inertia';
+
+    import Editor from '@tinymce/tinymce-vue';
 
     import Swal from 'sweetalert2';
 
@@ -160,17 +289,40 @@
         layout: LayoutApp,
 
         components: {
-            Head, Link
+            Head,
+            Link,
+            Editor
         },
 
         props:{
             // departments: Array,
             topics: Array,
             // users: Array,
-            sla_plans: Array
+            sla_plans: Array,
+            tag_modules: Array,
+            lis_menu_app: Array,
+            cis_menu_app: Array
         },
 
-        setup(props) {
+        data: () => ({
+            filter: '',
+        }),
+
+        methods: {
+            changeTopics: function(value) {
+                value = value.target.value;
+                this.filter = value;
+                // console.log(value)
+                // if(this.topic_id) {
+                //     // console.log(topic_id)
+                //     // this.filter == topic_id
+                // }else{
+                //     this.filter = false;
+                // }
+            },
+        },
+
+        setup() {
 
             const departments = ref({})
 
@@ -178,9 +330,9 @@
                 getUser: false,
             })
 
-            const selectedTopic = ref({
-                topic_id: ''
-            })
+            // const filter = ref({
+            //     filter: ''
+            // })
 
             const form = reactive({
                 ticket_source:  '',
@@ -192,7 +344,12 @@
                 customer_id: '',
                 branch_id: '',
                 title: '',
-                description: ''
+                description: '',
+                outlet_id: '',
+                analyzer_name: '',
+                hid: '',
+                cable_length: '',
+                additional_com: '',
             });
 
             onMounted(() => {
@@ -218,6 +375,14 @@
                     console.log(error.response.data)
                 })
             }
+
+            // function changeTopics() {
+            //     if(this.topic_id) {
+            //         this.filterTopic = this.topic_id
+            //     }else{
+            //         this.filterTopic = false
+            //     }
+            // }
             
             const submit = () => {
                 Inertia.post('/apps/master/tickets/store', {
@@ -230,7 +395,12 @@
                     customer_id:    form.customer_id,
                     branch_id:      form.branch_id,
                     title:          form.title,
-                    description:    form.description
+                    description:    form.description,
+                    outlet_id: form.outlet_id,
+                    analyzer_name: form.analyzer_name,
+                    hid: form.hid,
+                    cable_length: form.cable_length,
+                    additional_com: form.additional_com
                 }, {
                     onSuccess: () => {
                         Swal.fire({
