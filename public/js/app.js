@@ -27442,19 +27442,7 @@ var _hoisted_139 = {
 var _hoisted_140 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "class": "fw-bold"
 }, "Issue Details", -1 /* HOISTED */);
-var _hoisted_141 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-  style: {
-    "display": "block",
-    "margin-left": "auto",
-    "margin-right": "auto"
-  },
-  title: "Tiny Logo",
-  src: "{{ data.description }}",
-  alt: "TinyMCE Logo",
-  width: "128",
-  height: "128"
-})], -1 /* HOISTED */);
-var _hoisted_142 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_141 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "row"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "col-12"
@@ -27613,24 +27601,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return $setup.form.description = $event;
     }),
     init: {
-      menubar: _ctx.insert,
+      menubar: false,
       plugins: 'lists link image code emoticons print preview paste importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars',
       image_title: true,
       automatic_upload: true,
       paste_data_images: true,
-      // image_advtab: true,
-      imagetools_cors_hosts: ['picsum.photos'],
       toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image | code | emoticons |'
-      // image_list: [
-      // {title: 'My image 1', value: 'https://www.example.com/my1.gif'},
-      // {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}]
     }
-  }, {
-    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_141];
-    }),
-    _: 1 /* STABLE */
-  }, 8 /* PROPS */, ["modelValue", "init"])]), _hoisted_142], 32 /* HYDRATE_EVENTS */)])])])])])])])], 64 /* STABLE_FRAGMENT */);
+  }, null, 8 /* PROPS */, ["modelValue"])]), _hoisted_141], 32 /* HYDRATE_EVENTS */)])])])])])])])], 64 /* STABLE_FRAGMENT */);
 }
 
 /***/ }),

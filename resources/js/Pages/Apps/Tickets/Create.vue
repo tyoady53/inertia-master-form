@@ -235,20 +235,14 @@
                                             api-key="no-api-key"
                                             v-model="form.description"
                                             :init="{
-                                                menubar: insert,
+                                                menubar: false,
                                                 plugins: 'lists link image code emoticons print preview paste importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars',
                                                 image_title: true,
                                                 automatic_upload: true,
                                                 paste_data_images: true, 
-                                                // image_advtab: true,
-                                                imagetools_cors_hosts: ['picsum.photos'],
                                                 toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image | code | emoticons |',
-                                                // image_list: [
-                                                // {title: 'My image 1', value: 'https://www.example.com/my1.gif'},
-                                                // {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}]
-                                            }"
-                                            >
-                                            <p><img style="display: block; margin-left: auto; margin-right: auto;" title="Tiny Logo" src="{{ data.description }}" alt="TinyMCE Logo" width="128" height="128" /></p></Editor>
+                                            }">
+                                            </Editor>
                                     </div>
 
                                     <div class="row">
