@@ -30,7 +30,7 @@ class DashboardController extends Controller
         foreach($customer_branch as $branch){
             $output_branch .= " MasterCustomerBranch::create(['outlet_id' => '".$branch->outlet_id."','customer_id' => '".$branch->customer_id."','customer_branch' => '".$branch->customer_branch."']);\n";
         }
-        dd($output_cust, $output_branch);
+        // dd($output_cust, $output_branch);
         // dd($form_access);
         return Inertia::render('Apps/Dashboard/Index', [
             // 'form_access' => $form_access,

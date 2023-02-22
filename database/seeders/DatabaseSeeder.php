@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\MasterCustomer;
+use App\Models\MasterCustomerBranch;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -20,5 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call(MasterDivisionSeeder::class);
         $this->call(UserTableSeeder::class);
         $this->call(DataTypeSeeder::class);
+        $this->call(MasterCustomer::class);
+        $this->call(MasterCustomerBranch::class);
     }
 }
