@@ -66,22 +66,26 @@
             </div>
             
             <div class="row">
-                <div class="col-md-12">
+                <div v-for="thread in threads" :key="thread" class="col-md-12">
                     <div class="card border-0 rounded-3 shadow border-top-purple">
                         <div class="card-header">
                                 <div class="row">
                                     <div class="d-flex docs-highlight">
-                                        <div class="pt-0 w-82 docs-highlight">21/02/2023 10:19 PM</div>
-                                        <div class="p-0 flex-shrink-2">Support Wyna Pusat</div>
+                                        <div class="pt-0 w-82 docs-highlight">{{ thread.title }}</div>
+                                        <div class="p-0 flex-shrink-2">{{ thread.user.name }}</div>
+                                    </div>
+                                    <div class="d-flex docs-highlight">
+                                        <div class="p-0 flex-shrink-2">{{ thread.created_at }}</div>
                                     </div>
                                 </div>
                             </div>
                             <div class="card">
                                 <div class="card-body">
-                                    <Editor id="file-picker"
-                                            api-key="no-api-key"
-                                            v-model="data.description"
-                                    ></Editor>
+                                    {{ thread.description }}
+                                   <!-- <Editor
+                                   v-model=thread.description
+                                   >
+                                   </Editor> -->
                                 </div>
                             </div>
                     </div>
@@ -100,12 +104,15 @@
                             <div class="row">
                                 <div class="mb-3">
                                         <label class="fw-bold">Internal Note *</label>
-                                        <input class="form-control" type="text" placeholder="Internal Note">
+                                        <input class="form-control" type="text" v-model="form.title" placeholder="Internal Note">
                                     </div>
 
                                     <div class="mb-3">
                                         <label class="fw-bold">Note Details</label>
-                                        <textarea class="form-control" type="text" rows="4" placeholder="Details Description"></textarea>
+                                        <Editor
+                                        v-model="form.description"
+                                        >
+                                        </Editor>
                                     </div>
                             </div>
                             <div class="row">
@@ -113,19 +120,18 @@
                                     <div class="mb-3">
                                         <label class="fw-bold">Status *</label>
                                             <select class="form-select">
-                                                <option value>Open(Current)</option>
-                                                <option>Resolved</option>
-                                                <option>Closed</option>
+                                                <option value="open">Open(Current)</option>
+                                                <option value="resolved">Resolved</option>
+                                                <option value="closed">Closed</option>
                                             </select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="fw-bold">Reassign Ticket *</label>
-                                            <select class="form-select">
-                                                <option value disabled>Choose One</option>
-                                                <option>Tommy</option>
-                                                <option>Abi</option>
+                                            <select v-model="form.assign_id" class="form-select">
+                                                <option disabled value> Choose One</option>
+                                                <option v-for="user in users" :key="user.id" :value="user.id">{{ user.name }}</option>
                                             </select>
                                     </div>
                                 </div>
@@ -155,6 +161,9 @@ import { reactive } from 'vue';
 import { Inertia } from '@inertiajs/inertia';
 
 import Editor from '@tinymce/tinymce-vue';
+
+import Swal from 'sweetalert2';
+
 export default {
 
     layout: LayoutApp,
@@ -164,12 +173,45 @@ export default {
     },
 
     props: {
-        data   : Array,
-        // thread      : Object,
+        data : Array,
+        users : Array,
+        threads: Array,
     },
 
     setup(props) {
-        
+
+        const form = reactive({
+            helpdesk_id: props.data.thread_id,
+            title: '',
+            description: '',
+            file_upload: '',
+            assign_id: ''
+        })
+
+        const submit = () => {
+                Inertia.post('/apps/master/tickets/thread', {
+                    helpdesk_id: form.helpdesk_id,
+                    title: form.title,
+                    description: form.description,
+                    file_upload: form.file_upload,
+                    assign_id: form.assign_id
+                }, {
+                    onSuccess: () => {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Ticket saved successfully.',
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    },
+                });
+            }
+
+            return{
+                submit,
+                form
+            }
     },
 }
 </script>

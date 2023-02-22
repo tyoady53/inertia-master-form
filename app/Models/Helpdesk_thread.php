@@ -14,6 +14,11 @@ class Helpdesk_thread extends Model
 
     public function helpdesk()
     {
-        return $this->belongsTo(Helpdesk::class);
+        return $this->belongsTo(Helpdesk::class, 'helpdesk_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

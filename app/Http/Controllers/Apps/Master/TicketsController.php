@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Apps\Master;
 use App\Http\Controllers\Controller;
 use App\Models\Cis_menu_app;
 use App\Models\Helpdesk;
+use App\Models\Helpdesk_thread;
 use App\Models\Helpdesk_topic;
 use App\Models\Lis_cis_module;
 use App\Models\Lis_menu_app;
@@ -132,12 +133,32 @@ class TicketsController extends Controller
     {
 
         // dd($thread_id);
-        $thread = Helpdesk::with('user', 'topic', 'assign', 'sla', 'division')->where('thread_id', $thread_id)->first();
+        $thread = Helpdesk::with('user', 'topic', 'assign', 'sla', 'division', 'thread')->where('thread_id', $thread_id)->first();
+        $threads = Helpdesk_thread::with('user')->where('helpdesk_id', $thread_id)->orderBy('id', 'ASC')->get();
+        // dd($threads);
+        $users = User::where('id', '!=', auth()->user()->id)->get();
         // $helpdesk = Helpdesk::get();
 
         return Inertia::render('Apps/Tickets/Thread', [
             'data' => $thread,
+            'users'  => $users,
+            'threads' => $threads
             // 'helpdesks' => $helpdesk,
         ]); 
+    }
+
+    public function thread(Request $request)
+    {
+        Helpdesk_thread::create([
+            'helpdesk_id'   => $request->helpdesk_id,
+            'title'         => $request->title,
+            'description'   => $request->description,
+            'file_upload'   => $request->file_upload,
+            'assign_id'     => $request->assign_id,
+            'created_by'    => auth()->user()->id,
+
+        ]);
+
+        return back()->with('Data Berhasil Terkirim');
     }
 }
