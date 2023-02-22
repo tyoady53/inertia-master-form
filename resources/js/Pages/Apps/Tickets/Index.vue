@@ -41,7 +41,11 @@
                                 </thead>
                                 <tbody>
                                     <tr v-for="d in data" :key="d">
-                                        <td class="text-custom">{{ d.thread_id }}</td>
+                                        <td class="text-custom">
+                                            <Link :href="`/apps/master/tickets/${d.thread_id}/thread`">
+                                                {{ d.thread_id }}
+                                            </Link>
+                                        </td>
                                         <td class="text-custom">{{ d.ticket_date }}</td>
                                         <td class="text-custom">{{ d.topic.topic_name }}</td>
                                         <td class="text-custom">{{ d.customer_id }}</td>

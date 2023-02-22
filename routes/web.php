@@ -79,6 +79,8 @@ Route::prefix('apps')->group(function() {
                 Route::get('/', [TicketsController::class, 'index'])->name('apps.master.tickets.index');
                 Route::get('/create', [TicketsController::class, 'create'])->name('apps.master.tickets.create');
                 Route::post('/store', [TicketsController::class, 'store'])->name('apps.master.tickets.store');
+                Route::get('/{ticket:thread_id}/thread', [TicketsController::class, 'show'])->name('apps.master.tickets.show');
+                Route::post('/thread', [TicketsController::class, 'thread'])->name('apps.master.ticket.thread');
             });
         });
     });
