@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call(MasterDivisionSeeder::class);
         $this->call(UserTableSeeder::class);
         $this->call(DataTypeSeeder::class);
-        $this->call(MasterCustomer::class);
-        $this->call(MasterCustomerBranch::class);
+        $this->call(MasterCustomerSeeder::class);
+        $this->call(MasterCustomerBranchSeeder::class);
     }
 }

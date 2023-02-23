@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('helpdesk_topics', function (Blueprint $table) {
             $table->id();
+            $table->integer('id_category');
             $table->text('topic_name');
             $table->unsignedBigInteger('created_by');
             $table->unsignedBigInteger('edited_by')->nullable();

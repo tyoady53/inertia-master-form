@@ -50,7 +50,7 @@
                                         <label class="fw-bold">Help Topic *</label>
                                             <select class="form-select" v-model="form.topic_id" @change="changeTopics">
                                                 <option disabled value> Choose One</option>
-                                                <option v-for="topic in topics" :key="topic" :value="topic.id">{{ topic.topic_name }}</option>
+                                                <option v-for="topic in topics" :key="topic" :value="topic.id_category">{{ topic.topic_name }}</option>
                                             </select>
                                     </div>
 
@@ -88,9 +88,9 @@
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <label class="fw-bold">Customer *</label>
-                                                <select v-model="form.customer_id" class="form-select">
+                                                <select v-model="form.customer_id" class="form-select" @change="getBranch">
                                                     <option disabled value> Choose One</option>
-                                                    <option value="1">Diagnos</option>
+                                                    <option v-for="customer in master_customers" :key="customer" :value="customer.id">{{ customer.customer_name }}</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -99,49 +99,49 @@
                                                 <label class="fw-bold">Branch *</label>
                                                 <select v-model="form.branch_id" class="form-select">
                                                     <option disabled value> Choose One</option>
-                                                    <option value="1">Margonda</option>
+                                                    <option v-for="branch in branchs" :key="branch.id" :value="branch.id">{{ branch.customer_branch }}</option>
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
-
-                                    <div class="mb-3" v-if="filter == 1">
+                                    <!-- tag interfacing -->
+                                    <div class="mb-3" v-if="filter == 2">
                                         <label class="fw-bold">Outlet ID</label>
                                         <input v-model="form.outlet_id" class="form-control" type="text" placeholder="Issue">
                                     </div>
 
-                                    <div class="mb-3" v-if="filter == 1">
+                                    <div class="mb-3" v-if="filter == 2">
                                         <label class="fw-bold">Section ID</label>
                                         <input class="form-control" type="text" placeholder="Issue">
                                     </div>
                                     
-                                    <div class="mb-3" v-if="filter == 1">
+                                    <div class="mb-3" v-if="filter == 2">
                                         <label class="fw-bold">Analyzer Name</label>
                                         <input v-model="form.analyzer_name" class="form-control" type="text" placeholder="Issue">
                                     </div>
 
-                                    <div class="mb-3" v-if="filter == 1">
+                                    <div class="mb-3" v-if="filter == 2">
                                         <label class="fw-bold">Analyzer ID</label>
                                         <input class="form-control" type="text" placeholder="Issue">
                                     </div>
 
-                                    <div class="mb-3" v-if="filter == 1">
+                                    <div class="mb-3" v-if="filter == 2">
                                         <label class="fw-bold">HID</label>
                                         <input v-model="form.hid" class="form-control" type="text" placeholder="Issue">
                                     </div>
 
-                                    <div class="mb-3" v-if="filter == 1">
+                                    <div class="mb-3" v-if="filter == 2">
                                         <label class="fw-bold">Cable Length</label>
                                         <input v-model="form.cable_length" class="form-control" type="text" placeholder="Issue">
                                     </div>
 
-                                    <div class="mb-3" v-if="filter == 1">
+                                    <div class="mb-3" v-if="filter == 2">
                                         <label class="fw-bold">Additional com</label>
                                         <input v-model="form.additional_com" class="form-control" type="text" placeholder="Issue">
                                     </div>
 
                                     <!-- LIS CIS MODULES -->
-                                    <div class="mb-3" v-if="filter == 2">
+                                    <div class="mb-3" v-if="filter == 3">
                                         <label class="fw-bold">Tag Module *</label>
                                             <select v-model="form.tag_module_id" class="form-select">
                                                 <option disabled value> Choose One</option>
@@ -150,64 +150,66 @@
                                     </div>
 
                                     <!-- Reg Key -->
-                                    <div class="mb-3" v-if="filter == 3">
+                                    <div class="mb-3" v-if="filter == 4">
                                         <label class="fw-bold">Outlet ID</label>
                                         <input type="text" class="form-control">
                                     </div>
 
-                                    <div class="mb-3" v-if="filter == 3">
+                                    <div class="mb-3" v-if="filter == 4">
                                         <label class="fw-bold">Outlet Name</label>
                                         <input type="text" class="form-control">
                                     </div>
 
-                                    <div class="mb-3" v-if="filter == 3">
+                                    <div class="mb-3" v-if="filter == 4">
                                         <label class="fw-bold">Reason For Request</label>
                                         <textarea class="form-control" type="text" rows="4" placeholder="Details Description"></textarea>
                                     </div>
 
                                     <!-- Report And Data -->
-                                    <div class="mb-3" v-if="report">
+                                    <div class="mb-3" v-if="filter == 5">
                                         <label class="fw-bold">Request Type</label>
-                                        <option>New</option>
-                                        <option>Edit</option>
+                                        <select class="form-control">
+                                            <option>New</option>
+                                            <option>Edit</option>
+                                        </select>
                                     </div>
 
-                                    <div class="mb-3" v-if="report">
+                                    <div class="mb-3" v-if="filter == 5">
                                         <label class="fw-bold">Report ID</label>
                                         <input type="text" class="form-control">
                                     </div>
 
-                                    <div class="mb-3" v-if="report">
+                                    <div class="mb-3" v-if="filter == 5">
                                         <label class="fw-bold">Report Name</label>
                                         <textarea type="text" class="form-control" rows="3"></textarea>
                                     </div>
 
-                                    <div class="mb-3" v-if="report">
+                                    <div class="mb-3" v-if="filter == 5">
                                         <label class="fw-bold">PKG</label>
                                         <textarea type="text" class="form-control" rows="3"></textarea>
                                     </div>
 
-                                    <div class="mb-3" v-if="report">
+                                    <div class="mb-3" v-if="filter == 5">
                                         <label class="fw-bold">Report Type</label>
                                         <input type="text" class="form-control">
                                     </div>
 
-                                    <div class="mb-3" v-if="report">
+                                    <div class="mb-3" v-if="filter == 5">
                                         <label class="fw-bold">Report Date</label>
                                         <input type="text" class="form-control">
                                     </div>
 
-                                    <div class="mb-3" v-if="report">
+                                    <div class="mb-3" v-if="filter == 5">
                                         <label class="fw-bold">Purpose</label>
                                         <textarea type="text" class="form-control" rows="3"></textarea>
                                     </div>
 
-                                    <div class="mb-3" v-if="report">
+                                    <div class="mb-3" v-if="filter == 5">
                                         <label class="fw-bold">Data Displayed</label>
                                         <textarea type="text" class="form-control" rows="3"></textarea>
                                     </div>
 
-                                    <div class="mb-3" v-if="report">
+                                    <div class="mb-3" v-if="filter == 5">
                                         <label class="fw-bold">Lis Menu Tag</label>
                                             <select class="form-select">
                                                 <option disabled value> Choose One</option>
@@ -216,7 +218,7 @@
                                     </div>
 
                                     <!-- CIS APP -->
-                                    <div class="mb-3" v-if="cis">
+                                    <div class="mb-3" v-if="filter == 6">
                                         <label class="fw-bold">Lis Menu Tag</label>
                                             <select class="form-select">
                                                 <option disabled value> Choose One</option>
@@ -264,12 +266,11 @@
 
 <script>
 
-
     import LayoutApp from '../../../Layouts/App.vue';
 
     import { Head, Link } from '@inertiajs/inertia-vue3';
 
-    import { onMounted, reactive, ref, watch } from 'vue';
+    import { onMounted, reactive, ref } from 'vue';
 
     import { Inertia } from '@inertiajs/inertia';
 
@@ -295,7 +296,9 @@
             sla_plans: Array,
             tag_modules: Array,
             lis_menu_app: Array,
-            cis_menu_app: Array
+            cis_menu_app: Array,
+            master_customers: Array,
+            master_branch: Array,
         },
 
         data: () => ({
@@ -324,6 +327,12 @@
                 getUser: false,
             })
 
+            const customers = ref({})
+
+            const branchs = ref({
+                getBranch: false,
+            })
+
             // const filter = ref({
             //     filter: ''
             // })
@@ -343,17 +352,29 @@
 
             onMounted(() => {
 
-            axios.get(UrlOrigin+`/api/deparments`).then(response => {
+            axios.get(`http://localhost:8000/api/deparments`).then(response => {
                 departments.value = response.data.data
                 })
                 .catch(error => {
                     console.log(error.response.data)
                 })
-
             })
 
+            function getBranch() {
+                axios.post(`http://localhost:8000/api/branch`, {
+                    id: form.customer_id,
+                }).then(response => {
+                    branchs.value = response.data.data
+                }).then(() => {
+                    this.branchs.getBranch = true
+                })
+                .catch(error => {
+                    console.log(error.response.data)
+                })
+            }
+
             function getUser() {
-                axios.post(UrlOrigin+`/api/user`,{
+                axios.post(`http://localhost:8000/api/user`,{
                     id: form.department_id,
                 }).then(response => {
                     users.value = response.data.data
@@ -406,7 +427,10 @@
             form,
             departments,
             users,
+            customers,
+            branchs,
             getUser,
+            getBranch,
             submit
         }
         }

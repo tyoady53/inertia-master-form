@@ -82,10 +82,6 @@
                             <div class="card">
                                 <div class="card-body">
                                     {{ thread.description }}
-                                   <!-- <Editor
-                                   v-model=thread.description
-                                   >
-                                   </Editor> -->
                                 </div>
                             </div>
                     </div>
