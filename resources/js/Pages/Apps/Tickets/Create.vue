@@ -114,7 +114,7 @@
                                         <label class="fw-bold">Section ID</label>
                                         <input class="form-control" type="text" placeholder="Issue">
                                     </div>
-                                    
+
                                     <div class="mb-3" v-if="filter == 2">
                                         <label class="fw-bold">Analyzer Name</label>
                                         <input v-model="form.analyzer_name" class="form-control" type="text" placeholder="Issue">

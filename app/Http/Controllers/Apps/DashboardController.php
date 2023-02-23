@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Apps;
 
 use App\Http\Controllers\Controller;
+use App\Models\master_table;
 use App\Models\MasterCustomer;
 use App\Models\MasterCustomerBranch;
+use App\Models\MasterRelation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -20,6 +22,7 @@ class DashboardController extends Controller
      */
     public function __invoke(Request $request)
     {
+        // dd(MasterRelation::all());
         $output_cust = '';
         $output_branch = '';
         $customers = MasterCustomer::all();

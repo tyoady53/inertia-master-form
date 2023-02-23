@@ -360,14 +360,14 @@ class FormController extends Controller
 		} else {
             $form = DB::table($name)->latest()->get();
         }
-        $result = array();
+        // $result = array();
         $checklist_data = array();
         $parent_count = 0;
         $parent_data  = array();
         $child_data   = array();
         if($relation->count() > 0){
             foreach ($relation as $rel){
-                $result[] = [$rel->field_from => DB::table($rel->table_name_to)->get(),"field_from" => $rel->field_from];
+                $result = [$rel->field_from => DB::table($rel->table_name_to)->get(),"field_from" => $rel->field_from];
             }$relate = 'yes';
         } else {
             $relate = 'no';
