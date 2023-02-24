@@ -45,6 +45,9 @@
                                         <span class="font-weight-bold">Setting Report: </span><br>
                                     </div>
                                 </div>
+                                <div class="row shadow mt-2 p-2">
+                                    <p v-html="data.description"></p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -59,12 +62,11 @@
                                 <span class="font-weight-bold"><i class="fa fa-shield-alt"></i> [MHBD] SETTING REPORT HASIL PEMERIKSAAN PA</span>
                         </div>
                         <div class="card-body shadow">
-                                <span class="font-weight-bold"><i class="fa fa-refresh"></i>Ticket Thread</span>      
+                                <span class="font-weight-bold"><i class="fa fa-refresh"></i>Ticket Thread</span>
                             </div>
                     </div>
                 </div>
             </div>
-            
             <div class="row">
                 <div v-for="thread in threads" :key="thread" class="col-md-12">
                     <div class="card border-0 rounded-3 shadow border-top-purple">
@@ -81,7 +83,8 @@
                             </div>
                             <div class="card">
                                 <div class="card-body">
-                                    {{ thread.description }}
+                                    <div v-html="thread.descriptio"></div>
+                                    <!-- {{ thread.description }} -->
                                    <!-- <Editor
                                    v-model=thread.description
                                    >

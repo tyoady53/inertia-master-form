@@ -68,14 +68,16 @@ class TicketsController extends Controller
         $sla_hours = Sla_plan::where('id', $request->sla_id)->first();
         $last_data = Helpdesk::latest('created_at')->first();
         if($last_data){
-            if(substr($last_data->index_id,0,5)!=date("ym")){
+            if(substr($last_data->thread_id,0,5)==date("ym")){
                 $generated = date("ym").'0001';
             }else{
-                $generated = $last_data->index_id+1;
+                $generated = $last_data->thread_id+1;
             }
         } else {
-            $generated = date("ym").'0001' + 1;
+            $generated = date("ym").'0001';
         }
+
+        // dd($generated,$request,$last_data);
 
             Helpdesk::create([
             'thread_id' => $generated,
@@ -108,7 +110,6 @@ class TicketsController extends Controller
     public function getDepartments()
     {
         $departments = MasterDivision::get();
-
         return response()->json([
             'success'   => true,
             'message'   => 'Get All Departments',
@@ -149,6 +150,7 @@ class TicketsController extends Controller
 
     public function thread(Request $request)
     {
+        // dd($request);
         Helpdesk_thread::create([
             'helpdesk_id'   => $request->helpdesk_id,
             'title'         => $request->title,

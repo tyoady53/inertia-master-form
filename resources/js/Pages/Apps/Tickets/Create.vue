@@ -114,7 +114,7 @@
                                         <label class="fw-bold">Section ID</label>
                                         <input class="form-control" type="text" placeholder="Issue">
                                     </div>
-
+                                    
                                     <div class="mb-3" v-if="filter == 1">
                                         <label class="fw-bold">Analyzer Name</label>
                                         <input v-model="form.analyzer_name" class="form-control" type="text" placeholder="Issue">
@@ -236,11 +236,12 @@
                                             v-model="form.description"
                                             :init="{
                                                 menubar: false,
-                                                plugins: 'lists link image code emoticons print preview paste importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars',
+                                                plugins: 'file lists link image code emoticons print preview paste importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars',
                                                 image_title: true,
                                                 automatic_upload: true,
                                                 paste_data_images: true, 
-                                                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image | code | emoticons |',
+                                                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image | code | emoticons | file',
+                                                file_browser_callback_types: 'file image media',
                                             }">
                                             </Editor>
                                     </div>
@@ -317,6 +318,8 @@
         },
 
         setup(props) {
+
+            var UrlOrigin = window.location.origin;
 
             const departments = ref({})
 
