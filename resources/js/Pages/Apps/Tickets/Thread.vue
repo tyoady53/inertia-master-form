@@ -15,7 +15,7 @@
                                     <div class="col-md-6">
                                         <span class="font-weight-bold">Status: {{ data.status }} </span><br>
                                         <span class="font-weight-bold">Priority: {{ data.priority }} </span><br>
-                                        <!-- <span class="font-weight-bold">Department: {{ data.division.name }} </span><br> -->
+                                        <span class="font-weight-bold">Department: {{ data.division.name }} </span><br>
                                         <span class="font-weight-bold">Create Date: {{ data.duedate }} </span><br>
                                     </div>
                                     <div class="col-md-6">
@@ -38,11 +38,37 @@
                                         <span class="font-weight-bold">Last Response: Masih On Proses</span><br>
                                     </div>
                                 </div>
+
+                                <div v-if="data.topic.id == 2" class="row shadow mt-2 p-2">
+                                    <div class="col-md-6">
+                                        <span class="font-weight-bold">Outlet ID: {{ data.outlet_id }} </span><br>
+                                        <span class="font-weight-bold">Analyzer Name: {{ data.analyzer_name }}</span><br>
+                                        <span class="font-weight-bold">Analyzer ID: {{ data.analyzer_hid }} </span><br>
+                                        <span class="font-weight-bold">HID: {{ data.hid }}</span><br>
+                                    </div>
+                                </div>
+
+                                <div v-if="data.topic.id == 3" class="row shadow mt-2 p-2">
+                                    <div class="col-md-6">
+                                        <span class="font-weight-bold">Tag Module: </span><br>
+                                    </div>
+                                </div>
         
-                                <div class="row shadow mt-2 p-2">
+                                <div v-if="data.topic.id == 4" class="row shadow mt-2 p-2">
                                     <div class="col-md-6">
                                         <span class="font-weight-bold">Request Type: </span><br>
                                         <span class="font-weight-bold">Setting Report: </span><br>
+                                    </div>
+                                </div>
+
+                                <div v-if="data.topic.id == 5" class="row shadow mt-2 p-2">
+                                    <div class="col-md-6">
+                                        <span class="font-weight-bold">Request Type: </span><br>
+                                        <span class="font-weight-bold">Report ID: </span><br>
+                                        <span class="font-weight-bold">Report Name: </span><br>
+                                        <span class="font-weight-bold">PKG: </span><br>
+                                        <span class="font-weight-bold">Report Type: </span><br>
+                                        <span class="font-weight-bold">Purpose: </span><br>
                                     </div>
                                 </div>
                             </div>
@@ -56,11 +82,26 @@
                 <div class="col-md-12">
                     <div class="card border-0 rounded-3 shadow border-top-purple">
                         <div class="card-header">
-                                <span class="font-weight-bold"><i class="fa fa-shield-alt"></i> [MHBD] SETTING REPORT HASIL PEMERIKSAAN PA</span>
+                                <span class="font-weight-bold"><i class="fa fa-shield-alt"></i> {{ data.title }}</span>
                         </div>
                         <div class="card-body shadow">
                                 <span class="font-weight-bold"><i class="fa fa-refresh"></i>Ticket Thread</span>      
-                            </div>
+                        </div>
+                        <div class="card-body shadow">
+                                <div v-html="data.description"></div>
+                        </div>
+                        
+                        <!-- <Editor 
+                            v-model="data.description" disabled
+                        :init="{
+                            menubar: false,
+                            plugins: 'disable image code emoticons preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars',
+                            image_title: true,
+                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image | code | emoticons |',
+                            }">
+                        </Editor> -->
+
+                        <!-- {{ data.description }} -->
                     </div>
                 </div>
             </div>
@@ -156,9 +197,9 @@ import { reactive } from 'vue';
 
 import { Inertia } from '@inertiajs/inertia';
 
-import Editor from '@tinymce/tinymce-vue';
-
 import Swal from 'sweetalert2';
+
+import Editor from '@tinymce/tinymce-vue';
 
 export default {
 
@@ -169,7 +210,7 @@ export default {
     },
 
     props: {
-        data : Array,
+        data : Object,
         users : Array,
         threads: Array,
     },

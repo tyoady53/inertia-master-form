@@ -22,7 +22,7 @@ class TicketsController extends Controller
 {
     public function index()
     {
-        $helpdesks = Helpdesk::with('thread', 'topic', 'module', 'sla', 'lis', 'cis', 'user', 'assign')->get();
+        $helpdesks = Helpdesk::with('thread', 'topic', 'module', 'sla', 'lis', 'cis', 'user', 'assign', 'customer', 'branch')->get();
 
         return Inertia::render('Apps/Tickets/Index',[
             'data' => $helpdesks
@@ -56,7 +56,7 @@ class TicketsController extends Controller
     public function store(Request $request)
     {
 
-        // dd($request);
+        // dd(strlen($request->description));
         $this->validate($request, [
             'department_id' => 'required',
             'assign_id' => 'required',
@@ -73,13 +73,13 @@ class TicketsController extends Controller
         $sla_hours = Sla_plan::where('id', $request->sla_id)->first();
         $last_data = Helpdesk::latest('created_at')->first();
         if($last_data){
-            if(substr($last_data->index_id,0,5)!=date("ym")){
+            if(substr($last_data->thread_id,0,5)!=date("ym")){
                 $generated = date("ym").'0001';
             }else{
-                $generated = $last_data->index_id+1;
+                $generated = $last_data->thread_id + 1;
             }
         } else {
-            $generated = date("ym").'0001' + 1;
+            $generated = date("ym").'0001';
         }
 
             Helpdesk::create([
@@ -87,7 +87,7 @@ class TicketsController extends Controller
             'ticket_date' => date("Ymd"),
             'ticket_source' => $request->ticket_source,
             'duedate'       => Carbon::now()->addHours($sla_hours->sla_hour),
-            'status'        => 'pending',
+            'status'        => 'open',
             'created_by'    => auth()->user()->id,
             'department_id' => $request->department_id,
             'assign_id' => $request->assign_id,
