@@ -38,7 +38,7 @@
                                         <span class="font-weight-bold">Last Response: Masih On Proses</span><br>
                                     </div>
                                 </div>
-        
+
                                 <div class="row shadow mt-2 p-2">
                                     <div class="col-md-6">
                                         <span class="font-weight-bold">Request Type: </span><br>
@@ -83,7 +83,7 @@
                             </div>
                             <div class="card">
                                 <div class="card-body">
-                                    <div v-html="thread.descriptio"></div>
+                                    <div v-html="thread.description"></div>
                                     <!-- {{ thread.description }} -->
                                    <!-- <Editor
                                    v-model=thread.description

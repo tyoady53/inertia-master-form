@@ -21,3 +21,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/deparments', [TicketsController::class, 'getDepartments']);
 Route::post('/user', [TicketsController::class, 'getUser']);
+Route::post('/branch', [TicketsController::class, 'getBranch']);

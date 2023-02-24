@@ -9,6 +9,8 @@ use App\Models\Helpdesk_thread;
 use App\Models\Helpdesk_topic;
 use App\Models\Lis_cis_module;
 use App\Models\Lis_menu_app;
+use App\Models\MasterCustomer;
+use App\Models\MasterCustomerBranch;
 use App\Models\MasterDivision;
 use App\Models\Sla_plan;
 use App\Models\User;
@@ -27,7 +29,7 @@ class TicketsController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $departments = MasterDivision::get();
         $users = User::where('id', '!=', auth()->user()->id)->get();
@@ -36,6 +38,8 @@ class TicketsController extends Controller
         $tag_modules = Lis_cis_module::get();
         $lis_menu_tags = Lis_menu_app::get();
         $cis_menu_apps = Cis_menu_app::get();
+        $master_customers = MasterCustomer::get();
+        $master_customer = MasterCustomer::where('id', $request->id)->first();
 
         return Inertia::render('Apps/Tickets/Create', [
             'departments' => $departments,
@@ -44,7 +48,8 @@ class TicketsController extends Controller
             'sla_plans' => $sla_plans,
             'tag_modules' => $tag_modules,
             'lis_menu_app'  => $lis_menu_tags,
-            'cis_menu_app'  => $cis_menu_apps
+            'cis_menu_app'  => $cis_menu_apps,
+            'master_customers' => $master_customers,
         ]);
     }
 
@@ -127,6 +132,17 @@ class TicketsController extends Controller
             'success'   => true,
             'message'   =>'List Data City By Province : '.$departments->name.'',
             'data'      => $users
+        ]);
+    }
+
+    public function getBranch(Request $request)
+    {
+        $master_branch = MasterCustomerBranch::where('customer_id', $request->id)->get();
+
+        return response()->json([
+            'success'   => true,
+            'message'   => 'List Data Branch By Customer',
+            'data'      => $master_branch
         ]);
     }
 
