@@ -60,10 +60,6 @@
                                         <span class="font-weight-bold">Setting Report: </span><br>
                                     </div>
                                 </div>
-                                <div class="row shadow mt-2 p-2">
-                                    <p v-html="data.description"></p>
-
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -78,7 +74,6 @@
                                 <span class="font-weight-bold"><i class="fa fa-shield-alt"></i> {{ data.title }}</span>
                         </div>
                         <div class="card-body shadow">
-<<<<<<< HEAD
                                 <span class="font-weight-bold"><i class="fa fa-refresh"></i>Ticket Thread</span>      
                         </div>
                         <div class="card-body shadow">
@@ -87,22 +82,6 @@
                                 <a :href="`/storage/helpdesk/${data.file_upload}`" target="_blank" >{{ data.file_upload }}</a>
                             </div>
                         </div>
-                        
-                        <!-- <Editor 
-                            v-model="data.description" disabled
-                        :init="{
-                            menubar: false,
-                            plugins: 'disable image code emoticons preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars',
-                            image_title: true,
-                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image | code | emoticons |',
-                            }">
-                        </Editor> -->
-
-                        <!-- {{ data.description }} -->
-=======
-                                <span class="font-weight-bold"><i class="fa fa-refresh"></i>Ticket Thread</span>
-                            </div>
->>>>>>> 9149d9c54dc00a09212896efca08593ed2a5373c
                     </div>
                 </div>
             </div>
@@ -122,19 +101,10 @@
                             </div>
                             <div class="card">
                                 <div class="card-body">
-<<<<<<< HEAD
                                   <div v-html="thread.description" />
                                     <div v-for="file in thread.files" :key="file" class="alert alert-secondary m-1 p-2">
                                         <a :href="`/storage/helpdesk/${file.image}`" target="_blank">{{ file.image }}</a>
                                     </div>
-=======
-                                    <div v-html="thread.description"></div>
-                                    <!-- {{ thread.description }} -->
-                                   <!-- <Editor
-                                   v-model=thread.description
-                                   >
-                                   </Editor> -->
->>>>>>> 9149d9c54dc00a09212896efca08593ed2a5373c
                                 </div>
                                 
                             </div>
@@ -164,8 +134,6 @@
                                         >
                                         </Editor>
                                     </div>
-
-                                    <!-- <Multiple /> -->
 
                                     <div class="mb-3">
                                         <label class="fw-bold">File Upload</label>
@@ -221,8 +189,6 @@ import Swal from 'sweetalert2';
 
 import Editor from '@tinymce/tinymce-vue';
 
-// import Multiple from '../../../Components/MultipleUpload.vue';
-
 export default {
 
     layout: LayoutApp,
@@ -239,8 +205,6 @@ export default {
     },
 
     setup(props) {
-
-        // const uploadfiles = ref(null);
 
         const form = reactive({
             helpdesk_id: props.data.thread_id,

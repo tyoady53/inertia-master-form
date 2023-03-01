@@ -61,7 +61,6 @@ class TicketsController extends Controller
 
     public function store(Request $request)
     {
-        dd($request);
         $this->validate($request, [
             'department_id' => 'required',
             'assign_id' => 'required',
@@ -86,21 +85,13 @@ class TicketsController extends Controller
         } else {
             $generated = date("ym").'0001';
         }
-
-<<<<<<< HEAD
             $file_upload = $request->file('file_upload');
             $file_upload->storeAs('public/helpdesk', $file_upload->hashName());
 
             $helpdesk = Helpdesk::create([
             'thread_id'     => $generated,
             'ticket_date'   => date("Ymd"),
-=======
-        dd($generated,$request,$last_data);
 
-            Helpdesk::create([
-            'thread_id' => $generated,
-            'ticket_date' => date("Ymd"),
->>>>>>> 9149d9c54dc00a09212896efca08593ed2a5373c
             'ticket_source' => $request->ticket_source,
             'duedate'       => Carbon::now()->addHours($sla_hours->sla_hour),
             'status'        => 'open',
@@ -220,12 +211,8 @@ class TicketsController extends Controller
 
     public function thread(Request $request)
     {
-<<<<<<< HEAD
         $helpdesk_thread = Helpdesk_thread::create([
-=======
-        // dd($request);
-        Helpdesk_thread::create([
->>>>>>> 9149d9c54dc00a09212896efca08593ed2a5373c
+
             'helpdesk_id'   => $request->helpdesk_id,
             'title'         => $request->title,
             'description'   => $request->description,

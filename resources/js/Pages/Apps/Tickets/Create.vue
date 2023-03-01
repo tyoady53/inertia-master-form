@@ -177,15 +177,6 @@
                                         <input v-model="form.additional_com" class="form-control" type="text" placeholder="Additional Com">
                                     </div>
 
-                                    <!-- LIS CIS MODULES -->
-                                    <!-- <div class="mb-3" v-if="filter == 3">
-                                        <label class="fw-bold">Tag Module *</label>{{ tag_modules }}
-                                            <select v-model="form.tag_module_id" class="form-select">
-                                                <option disabled value> Choose One</option>
-                                                <option v-for="module in tag_modules" :key="module" :value="module.id"> {{ module.module_name }} </option>
-                                            </select>
-                                    </div> -->
-
                                     <!-- Reg Key -->
                                     <div class="mb-3" v-if="filter == 4">
                                         <label class="fw-bold">Outlet ID</label>
@@ -268,14 +259,9 @@
                                         <input v-model="form.title" class="form-control" type="text" rows="4" placeholder="Issue">
                                     </div>
 
-                                    <!-- <div class="mb-3">
-                                        <label class="fw-bold">File Upload</label>
-                                        <input type="file" multiple ref="file" class="form-control" @change="onChangeFile">
-                                    </div> -->
-
                                     <div class="mb-3">
                                         <label class="fw-bold">File Upload</label>
-                                        <input type="file" multiple  @input="form.image = $event.target.files[0]" class="form-control">
+                                        <input type="file"  @input="form.file_upload = $event.target.files[0]" class="form-control">
                                     </div>
 
                                     <div class="mb-3">
@@ -337,9 +323,7 @@
         },
 
         props:{
-            // departments: Array,
             topics: Array,
-            // users: Array,
             sla_plans: Array,
             tag_modules: Array,
             lis_menu_app: Array,
@@ -350,36 +334,18 @@
 
         data: () => ({
             filter: '',
-<<<<<<< HEAD
             postFormData: new FormData(),
-=======
             selectedChainIds: -1,
             selectedSubChainIds: -1,
->>>>>>> 9149d9c54dc00a09212896efca08593ed2a5373c
         }),
 
         methods: {
             changeTopics: function(value) {
                 value = value.target.value;
                 this.filter = value;
-                // console.log(value)
-                // if(this.topic_id) {
-                //     // console.log(topic_id)
-                //     // this.filter == topic_id
-                // }else{
-                //     this.filter = false;
-                // }
             },
 
-<<<<<<< HEAD
-            // onFileChange(event) {
-            //     for(var key in event.target.files) {
-            //         this.postFormData.append('images[]', event.target.files[key]);
-            //     }
-            // }
-=======
             getBranch() {
-                // console.log(this.form.customer_id)
                 this.form.branch_id = -1;
                 if(!this.form.customer_id) {
                     this.form.customer_id = -1;
@@ -396,10 +362,8 @@
                         filteredsubChains.push(structures);
                     }
                 }
-                // console.log(filteredsubChains)
                 return filteredsubChains;
             },
->>>>>>> 9149d9c54dc00a09212896efca08593ed2a5373c
         },
 
         setup(props) {
@@ -421,8 +385,6 @@
             const slas = ref({
                 getSla: false,
             })
-
-            // const file = ref(['']);
 
             const form = reactive({
                 ticket_source:  '',
@@ -467,13 +429,6 @@
                 .catch(error => {
                     console.log(error.response.data)
                 })
-
-                // axios.get(`http://localhost:8000/api/sla`).then(response => {
-                // sla.value = response.data.data
-                // })
-                // .catch(error => {
-                //     console.log(error.response.data)
-                // })
                 
             }) 
 
@@ -482,7 +437,6 @@
                     id: form.sla_id,
                 }).then(response => {
                     slas.value = response.data
-                    // console.log(slas)
                 }).then(() => {
                     this.slas.getSla = true
                 })
@@ -579,11 +533,6 @@
                 file_upload: form.file_upload,
                 data_display: form.data_display,
                 image: form.image
-                
-                // Array.from(images).forEach(image => {
-                //     form.image("images[]", image);
-                // });
-
                 }, {
                     onSuccess: () => {
                         Swal.fire({
@@ -603,14 +552,10 @@
             slas,
             customers,
             // branchs,
+            // getBranch,
             getUser,
-<<<<<<< HEAD
-            getBranch,
             onFileChange,
             getSla,
-=======
-            // getBranch,
->>>>>>> 9149d9c54dc00a09212896efca08593ed2a5373c
             submit
         }
         }
