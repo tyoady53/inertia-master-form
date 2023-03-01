@@ -39,7 +39,7 @@
                                     </div>
                                 </div>
 
-                                <div v-if="data.topic.id == 2" class="row shadow mt-2 p-2">
+                                <div class="row shadow mt-2 p-2">
                                     <div class="col-md-6">
                                         <span class="font-weight-bold">Outlet ID: {{ data.outlet_id }} </span><br>
                                         <span class="font-weight-bold">Analyzer Name: {{ data.analyzer_name }}</span><br>
@@ -60,16 +60,9 @@
                                         <span class="font-weight-bold">Setting Report: </span><br>
                                     </div>
                                 </div>
+                                <div class="row shadow mt-2 p-2">
+                                    <p v-html="data.description"></p>
 
-                                <div v-if="data.topic.id == 5" class="row shadow mt-2 p-2">
-                                    <div class="col-md-6">
-                                        <span class="font-weight-bold">Request Type: </span><br>
-                                        <span class="font-weight-bold">Report ID: </span><br>
-                                        <span class="font-weight-bold">Report Name: </span><br>
-                                        <span class="font-weight-bold">PKG: </span><br>
-                                        <span class="font-weight-bold">Report Type: </span><br>
-                                        <span class="font-weight-bold">Purpose: </span><br>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -85,6 +78,7 @@
                                 <span class="font-weight-bold"><i class="fa fa-shield-alt"></i> {{ data.title }}</span>
                         </div>
                         <div class="card-body shadow">
+<<<<<<< HEAD
                                 <span class="font-weight-bold"><i class="fa fa-refresh"></i>Ticket Thread</span>      
                         </div>
                         <div class="card-body shadow">
@@ -105,10 +99,13 @@
                         </Editor> -->
 
                         <!-- {{ data.description }} -->
+=======
+                                <span class="font-weight-bold"><i class="fa fa-refresh"></i>Ticket Thread</span>
+                            </div>
+>>>>>>> 9149d9c54dc00a09212896efca08593ed2a5373c
                     </div>
                 </div>
             </div>
-            
             <div class="row">
                 <div v-for="thread in threads" :key="thread" class="col-md-12">
                     <div class="card border-0 rounded-3 shadow border-top-purple">
@@ -125,10 +122,19 @@
                             </div>
                             <div class="card">
                                 <div class="card-body">
+<<<<<<< HEAD
                                   <div v-html="thread.description" />
                                     <div v-for="file in thread.files" :key="file" class="alert alert-secondary m-1 p-2">
                                         <a :href="`/storage/helpdesk/${file.image}`" target="_blank">{{ file.image }}</a>
                                     </div>
+=======
+                                    <div v-html="thread.description"></div>
+                                    <!-- {{ thread.description }} -->
+                                   <!-- <Editor
+                                   v-model=thread.description
+                                   >
+                                   </Editor> -->
+>>>>>>> 9149d9c54dc00a09212896efca08593ed2a5373c
                                 </div>
                                 
                             </div>

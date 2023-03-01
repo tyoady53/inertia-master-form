@@ -101,12 +101,47 @@
                                                 <label class="fw-bold">Branch *</label>
                                                 <select v-model="form.branch_id" class="form-select">
                                                     <option disabled value> Choose One</option>
-                                                    <option v-for="branch in branchs" :key="branch.id" :value="branch.id">{{ branch.customer_branch }}</option>
+                                                    <option v-for="branch in filteredChain" :key="branch.id" :value="branch.id">{{ branch.customer_branch }}</option>
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
                                     <!-- tag interfacing -->
+                                    <div class="mb-3" v-if="filter == 1">
+                                        <label class="fw-bold">Outlet ID</label>
+                                        <input v-model="form.outlet_id" class="form-control" type="text" placeholder="Issue">
+                                    </div>
+
+                                    <div class="mb-3" v-if="filter == 1">
+                                        <label class="fw-bold">Section ID</label>
+                                        <input class="form-control" type="text" placeholder="Issue">
+                                    </div>
+                                    
+                                    <div class="mb-3" v-if="filter == 1">
+                                        <label class="fw-bold">Analyzer Name</label>
+                                        <input v-model="form.analyzer_name" class="form-control" type="text" placeholder="Issue">
+                                    </div>
+
+                                    <div class="mb-3" v-if="filter == 1">
+                                        <label class="fw-bold">Analyzer ID</label>
+                                        <input class="form-control" type="text" placeholder="Issue">
+                                    </div>
+
+                                    <div class="mb-3" v-if="filter == 1">
+                                        <label class="fw-bold">HID</label>
+                                        <input v-model="form.hid" class="form-control" type="text" placeholder="Issue">
+                                    </div>
+
+                                    <div class="mb-3" v-if="filter == 1">
+                                        <label class="fw-bold">Cable Length</label>
+                                        <input v-model="form.cable_length" class="form-control" type="text" placeholder="Issue">
+                                    </div>
+
+                                    <div class="mb-3" v-if="filter == 1">
+                                        <label class="fw-bold">Additional com</label>
+                                        <input v-model="form.additional_com" class="form-control" type="text" placeholder="Issue">
+                                    </div>
+
                                     <div class="mb-3" v-if="filter == 2">
                                         <label class="fw-bold">Outlet ID</label>
                                         <input v-model="form.outlet_id" class="form-control" type="text" placeholder="Outlet ID">
@@ -143,13 +178,13 @@
                                     </div>
 
                                     <!-- LIS CIS MODULES -->
-                                    <div class="mb-3" v-if="filter == 3">
-                                        <label class="fw-bold">Tag Module *</label>
+                                    <!-- <div class="mb-3" v-if="filter == 3">
+                                        <label class="fw-bold">Tag Module *</label>{{ tag_modules }}
                                             <select v-model="form.tag_module_id" class="form-select">
                                                 <option disabled value> Choose One</option>
                                                 <option v-for="module in tag_modules" :key="module" :value="module.id"> {{ module.module_name }} </option>
                                             </select>
-                                    </div>
+                                    </div> -->
 
                                     <!-- Reg Key -->
                                     <div class="mb-3" v-if="filter == 4">
@@ -245,7 +280,8 @@
 
                                     <div class="mb-3">
                                         <label class="fw-bold">Issue Details</label>
-                                        <Editor
+                                        <Editor id="file-picker"
+                                        api-key="no-api-key"
                                             v-model="form.description"
                                             :init="{
                                                 menubar: false,
@@ -309,12 +345,17 @@
             lis_menu_app: Array,
             cis_menu_app: Array,
             master_customers: Array,
-            master_branch: Array,
+            master_customer_branches: Array,
         },
 
         data: () => ({
             filter: '',
+<<<<<<< HEAD
             postFormData: new FormData(),
+=======
+            selectedChainIds: -1,
+            selectedSubChainIds: -1,
+>>>>>>> 9149d9c54dc00a09212896efca08593ed2a5373c
         }),
 
         methods: {
@@ -330,14 +371,40 @@
                 // }
             },
 
+<<<<<<< HEAD
             // onFileChange(event) {
             //     for(var key in event.target.files) {
             //         this.postFormData.append('images[]', event.target.files[key]);
             //     }
             // }
+=======
+            getBranch() {
+                // console.log(this.form.customer_id)
+                this.form.branch_id = -1;
+                if(!this.form.customer_id) {
+                    this.form.customer_id = -1;
+                }
+            },
+        },
+
+        computed: {
+            filteredChain() {
+                let filteredsubChains = [];
+                for(let i = 0 ; i < this.master_customer_branches.length ; i++) {
+                    let structures = this.master_customer_branches[i];
+                    if(structures.customer_id == this.form.customer_id) {
+                        filteredsubChains.push(structures);
+                    }
+                }
+                // console.log(filteredsubChains)
+                return filteredsubChains;
+            },
+>>>>>>> 9149d9c54dc00a09212896efca08593ed2a5373c
         },
 
         setup(props) {
+
+            var UrlOrigin = window.location.origin;
 
             const departments = ref({})
 
@@ -347,9 +414,9 @@
 
             const customers = ref({})
 
-            const branchs = ref({
-                getBranch: false,
-            })
+            // const branchs = ref({
+            //     getBranch: false,
+            // })
 
             const slas = ref({
                 getSla: false,
@@ -394,7 +461,7 @@
 
             onMounted(() => {
 
-            axios.get(`http://localhost:8000/api/deparments`).then(response => {
+            axios.get(UrlOrigin+`/api/deparments`).then(response => {
                 departments.value = response.data.data
                 })
                 .catch(error => {
@@ -424,21 +491,21 @@
                 })
             }
 
-            function getBranch() {
-                axios.post(`http://localhost:8000/api/branch`, {
-                    id: form.customer_id,
-                }).then(response => {
-                    branchs.value = response.data.data
-                }).then(() => {
-                    this.branchs.getBranch = true
-                })
-                .catch(error => {
-                    console.log(error.response.data)
-                })
-            }
+            // function getBranch() {
+            //     axios.post(UrlOrigin+`/api/branch`, {
+            //         id: form.customer_id,
+            //     }).then(response => {
+            //         branchs.value = response.data.data
+            //     }).then(() => {
+            //         this.branchs.getBranch = true
+            //     })
+            //     .catch(error => {
+            //         console.log(error.response.data)
+            //     })
+            // }
 
             function getUser() {
-                axios.post(`http://localhost:8000/api/user`,{
+                axios.post(UrlOrigin+`/api/user`,{
                     id: form.department_id,
                 }).then(response => {
                     users.value = response.data.data
@@ -535,11 +602,15 @@
             users,
             slas,
             customers,
-            branchs,
+            // branchs,
             getUser,
+<<<<<<< HEAD
             getBranch,
             onFileChange,
             getSla,
+=======
+            // getBranch,
+>>>>>>> 9149d9c54dc00a09212896efca08593ed2a5373c
             submit
         }
         }

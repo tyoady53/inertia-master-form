@@ -44,6 +44,7 @@ class TicketsController extends Controller
         $cis_menu_apps = Cis_menu_app::get();
         $master_customers = MasterCustomer::get();
         $master_customer = MasterCustomer::where('id', $request->id)->first();
+        $master_customer_branches = MasterCustomerBranch::get();
 
         return Inertia::render('Apps/Tickets/Create', [
             'departments' => $departments,
@@ -54,6 +55,7 @@ class TicketsController extends Controller
             'lis_menu_app'  => $lis_menu_tags,
             'cis_menu_app'  => $cis_menu_apps,
             'master_customers' => $master_customers,
+            'master_customer_branches' => $master_customer_branches,
         ]);
     }
 
@@ -75,21 +77,30 @@ class TicketsController extends Controller
         $sla_hours = Sla_plan::where('id', $request->sla_id)->first();
         $last_data = Helpdesk::latest('created_at')->first();
         if($last_data){
-            if(substr($last_data->thread_id,0,5)!=date("ym")){
+            if(substr($last_data->thread_id,0,5)==date("ym")){
                 $generated = date("ym").'0001';
             }else{
-                $generated = $last_data->thread_id + 1;
+                $generated = $last_data->thread_id+1;
+
             }
         } else {
             $generated = date("ym").'0001';
         }
 
+<<<<<<< HEAD
             $file_upload = $request->file('file_upload');
             $file_upload->storeAs('public/helpdesk', $file_upload->hashName());
 
             $helpdesk = Helpdesk::create([
             'thread_id'     => $generated,
             'ticket_date'   => date("Ymd"),
+=======
+        dd($generated,$request,$last_data);
+
+            Helpdesk::create([
+            'thread_id' => $generated,
+            'ticket_date' => date("Ymd"),
+>>>>>>> 9149d9c54dc00a09212896efca08593ed2a5373c
             'ticket_source' => $request->ticket_source,
             'duedate'       => Carbon::now()->addHours($sla_hours->sla_hour),
             'status'        => 'open',
@@ -145,7 +156,6 @@ class TicketsController extends Controller
     public function getDepartments()
     {
         $departments = MasterDivision::get();
-
         return response()->json([
             'success'   => true,
             'message'   => 'Get All Departments',
@@ -210,7 +220,12 @@ class TicketsController extends Controller
 
     public function thread(Request $request)
     {
+<<<<<<< HEAD
         $helpdesk_thread = Helpdesk_thread::create([
+=======
+        // dd($request);
+        Helpdesk_thread::create([
+>>>>>>> 9149d9c54dc00a09212896efca08593ed2a5373c
             'helpdesk_id'   => $request->helpdesk_id,
             'title'         => $request->title,
             'description'   => $request->description,

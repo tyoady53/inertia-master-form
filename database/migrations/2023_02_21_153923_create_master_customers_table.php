@@ -16,6 +16,8 @@ return new class extends Migration
         Schema::create('master_customers', function (Blueprint $table) {
             $table->id();
             $table->string('customer_name');
+            $table->string('status');
+            $table->string('is_show')->default('1');
             $table->timestamps();
         });
     }

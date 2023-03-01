@@ -21,13 +21,21 @@
                                         <input class="form-control" type="text" v-model="form.table_name" placeholder="Name Table">
                                     </div>
                                     <div class="row">
-                                        <div class="col-lg-2">&nbsp&nbsp&nbsp&nbsp
+                                        <div class="col-lg-3">&nbsp&nbsp&nbsp&nbsp
                                             <input class="form-check-input" type="checkbox" v-model="form.extend" id="extend">
                                             <label class="form-check-label" for="extend">Extend</label>
                                         </div>
-                                        <div class="col-lg-7">
+                                        <div class="col-lg-3">
                                             <input class="form-check-input" type="checkbox" v-model="form.status" id="status">
-                                            <label class="form-check-label" for="status_report">Status Report</label>
+                                            <label class="form-check-label" for="status">Status Report</label>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <input class="form-check-input" type="checkbox" v-model="form.customer" id="customer">
+                                            <label class="form-check-label" for="customer">Use Customer</label>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <input class="form-check-input" type="checkbox" v-model="form.clipboard" id="clipboard">
+                                            <label class="form-check-label" for="clipboard">Use Clipboard</label>
                                         </div>
                                     </div>
 
@@ -105,6 +113,8 @@ export default {
             name: '',
             extend:'',
             status:'',
+            customer:'',
+            clipboard:'',
             roles: [],
             create: [],
             edit: [],
@@ -116,6 +126,8 @@ export default {
                 name: form.table_name,
                 extend: form.extend,
                 status: form.status,
+                customer: form.customer,
+                clipboard: form.clipboard,
                 roles: form.roles,
                 create: form.create,
                 edit: form.edit,

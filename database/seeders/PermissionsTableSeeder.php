@@ -37,5 +37,11 @@ class PermissionsTableSeeder extends Seeder
 
         //permission permissions
         Permission::create(['name' => 'permissions.index', 'guard_name' => 'web']);
+
+        Permission::create(['name' => 'form-master_customers.index', 'guard_name' => 'web']);
+        Permission::create(['name' => 'form-master_customers.create', 'guard_name' => 'web']);
+
+        Permission::create(['name' => 'form-master_customer_branches.index', 'guard_name' => 'web']);
+        Permission::create(['name' => 'form-master_customer_branches.create', 'guard_name' => 'web']);
     }
 }
