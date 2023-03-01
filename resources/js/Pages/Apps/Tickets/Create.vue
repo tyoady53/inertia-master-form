@@ -36,7 +36,7 @@
                                         </div>
 
                                         <div class="col-md-4">
-                                            <div class="mb-3">
+                                            <div class="mb-3" v-if="users.getUser">
                                                 <label class="fw-bold">Assign To</label>
                                                 <select v-model="form.assign_id" class="form-select">
                                                     <option disabled value> Choose One</option>
