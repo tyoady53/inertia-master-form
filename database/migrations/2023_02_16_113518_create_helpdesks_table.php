@@ -18,10 +18,10 @@ return new class extends Migration
             $table->unsignedBigInteger('thread_id');
             $table->date('ticket_date');
             $table->string('ticket_source');
-            $table->unsignedBigInteger('customer_id')->nullable(); //optional
+            $table->unsignedBigInteger('customer_id');
             $table->unsignedBigInteger('branch_id')->nullable(); //optional
             $table->unsignedBigInteger('topic_id')->nullable();
-            $table->unsignedBigInteger('departement_id');
+            $table->unsignedBigInteger('department_id');
             $table->unsignedBigInteger('sla_id')->nullable();
             $table->dateTime('duedate');
             $table->unsignedBigInteger('assign_id');

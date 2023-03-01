@@ -54,7 +54,17 @@ class Helpdesk extends Model
 
     public function division()
     {
-        return $this->belongsTo(MasterDivision::class, 'departement_id');
+        return $this->belongsTo(MasterDivision::class, 'department_id');
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(MasterCustomer::class, 'customer_id');
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(MasterCustomerBranch::class, 'branch_id');
     }
 
 }

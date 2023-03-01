@@ -48,8 +48,8 @@
                                         </td>
                                         <td class="text-custom">{{ d.ticket_date }}</td>
                                         <td class="text-custom">{{ d.topic.topic_name }}</td>
-                                        <td class="text-custom">{{ d.customer_id }}</td>
-                                        <td class="text-custom">{{ d.branch_id }}</td>
+                                        <td class="text-custom">{{ d.customer.customer_name }}</td>
+                                        <td class="text-custom">{{ d.branch.customer_branch }}</td>
                                         <td class="text-custom">{{ d.title }}</td>
                                         <td class="text-custom">{{ d.user.name }}</td>
                                         <td class="text-custom">{{ d.priority }}</td>

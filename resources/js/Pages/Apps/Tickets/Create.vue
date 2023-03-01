@@ -273,10 +273,10 @@
                                             v-model="form.description"
                                             :init="{
                                                 menubar: false,
-                                                plugins: 'lists link image code emoticons print preview paste importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars',
+                                                plugins: 'image code emoticons preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars',
                                                 image_title: true,
-                                                automatic_upload: true,
-                                                paste_data_images: true, 
+                                                automatic_uploads: false, 
+                                                images_upload_url: '/api/upload-image',
                                                 toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image | code | emoticons |',
                                             }">
                                             </Editor>
@@ -446,14 +446,6 @@
                     console.log(error.response.data)
                 })
             }
-
-            // function changeTopics() {
-            //     if(this.topic_id) {
-            //         this.filterTopic = this.topic_id
-            //     }else{
-            //         this.filterTopic = false
-            //     }
-            // }
             
             const submit = () => {
                 Inertia.post('/apps/master/tickets/store', {
@@ -467,10 +459,10 @@
                     branch_id:      form.branch_id,
                     title:          form.title,
                     description:    form.description,
-                    outlet_id: form.outlet_id,
-                    analyzer_name: form.analyzer_name,
-                    hid: form.hid,
-                    cable_length: form.cable_length,
+                    outlet_id:      form.outlet_id,
+                    analyzer_name:  form.analyzer_name,
+                    hid:            form.hid,
+                    cable_length:   form.cable_length,
                     additional_com: form.additional_com
                 }, {
                     onSuccess: () => {
