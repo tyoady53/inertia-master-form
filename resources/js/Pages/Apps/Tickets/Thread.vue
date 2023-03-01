@@ -89,6 +89,9 @@
                         </div>
                         <div class="card-body shadow">
                                 <div v-html="data.description"></div>
+                            <div class="alert alert-secondary m-1 p-2">
+                                <a :href="`/storage/helpdesk/${data.file_upload}`" target="_blank" >{{ data.file_upload }}</a>
+                            </div>
                         </div>
                         
                         <!-- <Editor 
@@ -122,8 +125,12 @@
                             </div>
                             <div class="card">
                                 <div class="card-body">
-                                    {{ thread.description }}
+                                  <div v-html="thread.description" />
+                                    <div v-for="file in thread.files" :key="file" class="alert alert-secondary m-1 p-2">
+                                        <a :href="`/storage/helpdesk/${file.image}`" target="_blank">{{ file.image }}</a>
+                                    </div>
                                 </div>
+                                
                             </div>
                     </div>
                 </div>
@@ -150,6 +157,13 @@
                                         v-model="form.description"
                                         >
                                         </Editor>
+                                    </div>
+
+                                    <!-- <Multiple /> -->
+
+                                    <div class="mb-3">
+                                        <label class="fw-bold">File Upload</label>
+                                        <input type="file" id="uploadfiles" ref="uploadfiles" multiple class="form-control" @change="fieldChange">
                                     </div>
                             </div>
                             <div class="row">
@@ -191,15 +205,17 @@
 
 import LayoutApp from '../../../Layouts/App.vue';
 
-import { Head, Link } from '@inertiajs/inertia-vue3';
+import { Head, Link} from '@inertiajs/inertia-vue3';
 
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 
 import { Inertia } from '@inertiajs/inertia';
 
 import Swal from 'sweetalert2';
 
 import Editor from '@tinymce/tinymce-vue';
+
+// import Multiple from '../../../Components/MultipleUpload.vue';
 
 export default {
 
@@ -213,25 +229,48 @@ export default {
         data : Object,
         users : Array,
         threads: Array,
+        files: Array
     },
 
     setup(props) {
+
+        // const uploadfiles = ref(null);
 
         const form = reactive({
             helpdesk_id: props.data.thread_id,
             title: '',
             description: '',
-            file_upload: '',
-            assign_id: ''
+            assign_id: '',
+            file_upload: [],
+            uploadfiles: []
         })
+
+        const fieldChange = (e) => {
+
+            let selectedFiles = e.target.files;
+            
+            console.log(selectedFiles)
+
+            if(!selectedFiles.length) {
+                return false;
+            }
+
+            for(let i=0;i<selectedFiles.length;i++){
+                    form.uploadfiles.push(selectedFiles[i]);
+                }
+
+            console.log(form.uploadfiles)
+
+        }
 
         const submit = () => {
                 Inertia.post('/apps/master/tickets/thread', {
                     helpdesk_id: form.helpdesk_id,
                     title: form.title,
                     description: form.description,
+                    assign_id: form.assign_id,
                     file_upload: form.file_upload,
-                    assign_id: form.assign_id
+                    image: form.uploadfiles
                 }, {
                     onSuccess: () => {
                         Swal.fire({
@@ -247,6 +286,7 @@ export default {
 
             return{
                 submit,
+                fieldChange,
                 form
             }
     },

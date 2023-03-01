@@ -22,7 +22,11 @@ class TicketsController extends Controller
 {
     public function index()
     {
-        $helpdesks = Helpdesk::with('thread', 'topic', 'module', 'sla', 'lis', 'cis', 'user', 'assign', 'customer', 'branch')->get();
+        $helpdesks = Helpdesk::when(request()->q, function($helpdesks) {
+            $helpdesks = $helpdesks->where('status', 'like', '%'. request()->q . '%');
+        })->where('assign_id', auth()->user()->id)->with('thread', 'topic', 'module', 'sla', 'lis', 'cis', 'user', 'assign', 'customer', 'branch')->get();
+
+        // dd($helpdesks);
 
         return Inertia::render('Apps/Tickets/Index',[
             'data' => $helpdesks
@@ -55,8 +59,7 @@ class TicketsController extends Controller
 
     public function store(Request $request)
     {
-
-        // dd(strlen($request->description));
+        dd($request);
         $this->validate($request, [
             'department_id' => 'required',
             'assign_id' => 'required',
@@ -67,7 +70,6 @@ class TicketsController extends Controller
             'customer_id' => 'required',
             'branch_id' => 'required',
             'title' => 'required',
-            'description' => 'required'
         ]);
 
         $sla_hours = Sla_plan::where('id', $request->sla_id)->first();
@@ -82,30 +84,60 @@ class TicketsController extends Controller
             $generated = date("ym").'0001';
         }
 
-            Helpdesk::create([
-            'thread_id' => $generated,
-            'ticket_date' => date("Ymd"),
+            $file_upload = $request->file('file_upload');
+            $file_upload->storeAs('public/helpdesk', $file_upload->hashName());
+
+            $helpdesk = Helpdesk::create([
+            'thread_id'     => $generated,
+            'ticket_date'   => date("Ymd"),
             'ticket_source' => $request->ticket_source,
             'duedate'       => Carbon::now()->addHours($sla_hours->sla_hour),
             'status'        => 'open',
             'created_by'    => auth()->user()->id,
             'department_id' => $request->department_id,
-            'assign_id' => $request->assign_id,
-            'topic_id' => $request->topic_id,
-            'sla_id' => $request->sla_id,
-            'priority' => $request->priority,
-            'customer_id' => $request->customer_id,
-            'branch_id' => $request->branch_id,
-            'title' => $request->title,
-            'description' => $request->description,
-            'outlet_id' => $request->outlet_id,
-            // 'out_name'  => $request->out_name,
+            'assign_id'     => $request->assign_id,
+            'topic_id'      => $request->topic_id,
+            'sla_id'        => $request->sla_id,
+            'priority'      => $request->priority,
+            'customer_id'   => $request->customer_id,
+            'branch_id'     => $request->branch_id,
+            'title'         => $request->title,
+            'description'   => $request->description,
+            'outlet_id'     => $request->outlet_id,
+            'out_name'      => $request->out_name,
             'analyzer_name' => $request->analyzer_name,
-            'hid'   => $request->hid,
+            'hid'           => $request->hid,
             'cable_length'  => $request->cable_length,
             'additional_com'    => $request->additional_com,
-
+            'reason_reg'    => $request->reason_request,
+            'tag_module_id' => $request->tag_module_id,
+            'cis_menu_id'   => $request->cis_menu_id,
+            'lis_menu_app'  => $request->lis_menu_app,
+            'reg_report_type'   => $request->reg_report_type,
+            'report_id'     => $request->report_id,
+            'report_name'   => $request->report_name,
+            'pkg'           => $request->pkg,
+            'report_type'   => $request->report_type,
+            'report_date'   => $request->report_date,
+            'purpose'       => $request->purpose,
+            'data_display'  => $request->data_display,
+            'file_upload'   => $file_upload->hashName()
         ]);
+
+        if($request->hasFile('image')) {
+
+            $files = $request->file('image');
+
+            foreach($files as $file) {
+
+                $file->storeAs('public/helpdesk', $file->hashName());
+
+                $helpdesk->images()->create([
+                    'image' => $file->hashName(),
+                    'file_upload_id' => $helpdesk->id 
+                ]);
+            }
+        }
 
         return redirect()->route('apps.master.tickets.index');
     }
@@ -148,24 +180,37 @@ class TicketsController extends Controller
     public function show($thread_id) 
     {
 
-        // dd($thread_id);
         $thread = Helpdesk::with('user', 'topic', 'assign', 'sla', 'division', 'thread')->where('thread_id', $thread_id)->first();
-        $threads = Helpdesk_thread::with('user')->where('helpdesk_id', $thread_id)->orderBy('id', 'ASC')->get();
+        $threads = Helpdesk_thread::with('user', 'files')->where('helpdesk_id', $thread_id)->orderBy('id', 'ASC')->get();
+
         // dd($threads);
         $users = User::where('id', '!=', auth()->user()->id)->get();
-        // $helpdesk = Helpdesk::get();
+
+        // $path = $request->image->getClientOriginalName();
 
         return Inertia::render('Apps/Tickets/Thread', [
             'data' => $thread,
             'users'  => $users,
-            'threads' => $threads
+            'threads' => $threads,
+            // 'files' => $files
             // 'helpdesks' => $helpdesk,
         ]); 
     }
 
+    public function getUsers()
+    {
+        $users = User::get();
+
+        return response()->json([
+            'success'   => true,
+            'message'   => 'Get Users',
+            'data'      => $users
+        ]);
+    }
+
     public function thread(Request $request)
     {
-        Helpdesk_thread::create([
+        $helpdesk_thread = Helpdesk_thread::create([
             'helpdesk_id'   => $request->helpdesk_id,
             'title'         => $request->title,
             'description'   => $request->description,
@@ -175,6 +220,34 @@ class TicketsController extends Controller
 
         ]);
 
+        if($request->hasFile('image')) {
+
+            $files = $request->file('image');
+
+            foreach($files as $file) {
+
+                $file->storeAs('public/helpdesk', $file->hashName());
+
+                $helpdesk_thread->files()->create([
+                    'image' => $file->hashName(),
+                    'file_upload_id' => $helpdesk_thread->id 
+                ]);
+            }
+        }
+
         return back()->with('Data Berhasil Terkirim');
+    }
+
+    public function sla(Request $request)
+    {
+        // dd($request);
+        $sla_hour = Sla_plan::where('id', $request->id)->first();
+        $time = Carbon::now()->addHours($sla_hour->sla_hour);
+        
+        return response()->json([
+            'success'   => true,
+            'message'   => 'Time SLA Time :'.$sla_hour->sla_hour.' Hours(s)',
+            'data'      => $time
+        ]);
     }
 }

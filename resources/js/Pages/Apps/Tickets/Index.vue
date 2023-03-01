@@ -6,21 +6,22 @@
             <div class="col-md-12">
                 <div class="card border-0 rounded-3 shadow-border-top-purple">
                     <div class="card-header">
-                        <span class="font-weight-bold"><i class="fa fa-shield-alt"></i> Ticket</span>
+                        <span class="font-weight-bold"><i class="fa fa-shield-alt pt-2"></i> Ticket</span>
+                        <Link href="/apps/master/tickets/create" class="btn btn-primary float-end"> <i class="fa fa-plus-circle me-2"></i> NEW</Link>
                     </div>
                     <div class="card-body">
-                            <form>
-                                <div class="input-group mb-3">
+                            <form @submit.prevent="">
+                                <!-- <div class="input-group mb-3 float-end">
                                     <Link href="/apps/master/tickets/create" class="btn btn-primary input-group-text"> <i class="fa fa-plus-circle me-2"></i> NEW</Link>
-                                    <input type="text" class="form-control" placeholder="search by ticket id . . .">
+                                    <input type="text" class="form-control" v-model="search" placeholder="search by ticket id . . .">
 
                                     <button class="btn btn-primary input-group-text" type="submit"> <i class="fa fa-search me-2"></i> SEARCH</button>
-                                </div>
-                                <div class="mb-3">
-                                    <Link href="#" class="btn btn-primary btn-sm me-2"><i class="fa fa-ticket-alt me-1"></i> OPEN</Link>
-                                    <Link href="#" class="btn btn-primary btn-sm me-2"><i class="fa fa-ticket-alt me-1"></i> ASSIGNED</Link>
-                                    <Link href="#" class="btn btn-primary btn-sm me-2"><i class="fa fa-ticket-alt me-1"></i> OVERDUE</Link>
-                                    <Link href="#" class="btn btn-primary btn-sm me-2"><i class="fa fa-ticket-alt me-1"></i> CLOSED</Link>
+                                </div> -->
+                                <div class="input-group mb-3">
+                                    <button @click="handleOpen" value="open" class="btn btn-primary btn-sm me-2"><i class="fa fa-ticket-alt me-1"></i> OPEN</button>
+                                    <button @click="assigned " class="btn btn-primary btn-sm me-2"><i class="fa fa-ticket-alt me-1"></i> ASSIGNED</button>
+                                    <button @click="overdue" class="btn btn-primary btn-sm me-2"><i class="fa fa-ticket-alt me-1"></i> OVERDUE</button>
+                                    <button @click="handleClosed" value="closed" class="btn btn-primary btn-sm me-2"><i class="fa fa-ticket-alt me-1"></i> CLOSED</button>
                                 </div>
                             </form>
                             <div style="overflow-x: auto;">
@@ -72,7 +73,11 @@
 <script>
     import LayoutApp from '../../../Layouts/App.vue';
 
-    import { Head, Link } from '@inertiajs/inertia-vue3';
+    import { Head, Link } from '@inertiajs/inertia-vue3';   
+
+    import { ref } from 'vue';
+
+    import { Inertia } from '@inertiajs/inertia';
 
     export default {
         layout: LayoutApp,
@@ -83,6 +88,37 @@
 
         props: {
             data: Array
+        },
+
+        setup() {
+
+            // const search = ref('' || (new URL(document.location)).searchParams.get('q'));
+
+            const open = ref('open' || (new URL(document.location)).searchParams.get('q'));
+            const assigned = ref('assigned' || (new URL(document.location)).searchParams.get('q'));
+            const overdue = ref('overdue' || (new URL(document.location)).searchParams.get('q'));
+            const closed = ref('closed' || (new URL(document.location)).searchParams.get('q'));
+
+            const handleOpen = () => {
+                Inertia.get('/apps/master/tickets', {
+                    q: open.value
+                });
+            }
+
+            const handleClosed = () => {
+                Inertia.get('/apps/master/tickets', {
+                    q: closed.value
+                });
+            }
+
+         return {
+            // search,
+            assigned,
+            overdue,
+            handleOpen,
+            handleClosed,
+        }
+
         }
         
     }

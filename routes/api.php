@@ -20,5 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/deparments', [TicketsController::class, 'getDepartments']);
+Route::post('/sla', [TicketsController::class, 'sla']);
 Route::post('/user', [TicketsController::class, 'getUser']);
 Route::post('/branch', [TicketsController::class, 'getBranch']);
+Route::get('/users', [TicketsController::class, 'getUsers']);

@@ -20,6 +20,7 @@
   
           <!-- content -->
           <slot />
+
           <!-- end content -->
   
           <footer class="c-footer">

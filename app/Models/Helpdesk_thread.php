@@ -21,4 +21,9 @@ class Helpdesk_thread extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function files()
+    {
+        return $this->hasMany(FileUpload::class , 'file_upload_id');
+    }
 }

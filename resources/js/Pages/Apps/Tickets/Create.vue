@@ -50,15 +50,17 @@
                                         <label class="fw-bold">Help Topic *</label>
                                             <select class="form-select" v-model="form.topic_id" @change="changeTopics">
                                                 <option disabled value> Choose One</option>
-                                                <option v-for="topic in topics" :key="topic" :value="topic.id_category">{{ topic.topic_name }}</option>
+                                                <option v-for="topic in topics" :key="topic" :value="topic.id">{{ topic.topic_name }}</option>
                                             </select>
                                     </div>
+
+                                    {{ form.topic_id }}
 
                                     <div class="row">
                                         <div class="col-md-8">
                                             <div class="mb-3">
                                                 <label class="fw-bold">SLA PLAN</label>
-                                                <select v-model="form.sla_id" class="form-select">
+                                                <select v-model="form.sla_id" class="form-select" @change="getSla">
                                                     <option disabled value> Choose One</option>
                                                     <option v-for="sla in sla_plans" :key="sla" :value="sla.id">{{ sla.sla_name }} - ({{ sla.sla_hour }} Hours)</option>
                                                 </select>
@@ -66,8 +68,8 @@
                                         </div>
                                         <div class="col-md-4">
                                             <div class="mb-3">
-                                                <label class="fw-bold">DATE</label>
-                                                <input class="form-control" type="time" placeholder="Date" disabled> 
+                                                <label class="fw-bold">DATE</label><br>
+                                                <input class="form-control" :value="slas.data" readonly>
                                             </div>
                                         </div>
                                     </div>
@@ -107,37 +109,37 @@
                                     <!-- tag interfacing -->
                                     <div class="mb-3" v-if="filter == 2">
                                         <label class="fw-bold">Outlet ID</label>
-                                        <input v-model="form.outlet_id" class="form-control" type="text" placeholder="Issue">
+                                        <input v-model="form.outlet_id" class="form-control" type="text" placeholder="Outlet ID">
                                     </div>
 
                                     <div class="mb-3" v-if="filter == 2">
                                         <label class="fw-bold">Section ID</label>
-                                        <input class="form-control" type="text" placeholder="Issue">
+                                        <input class="form-control" type="text" placeholder="Section ID">
                                     </div>
 
                                     <div class="mb-3" v-if="filter == 2">
                                         <label class="fw-bold">Analyzer Name</label>
-                                        <input v-model="form.analyzer_name" class="form-control" type="text" placeholder="Issue">
+                                        <input v-model="form.analyzer_name" class="form-control" type="text" placeholder="Analyzer Name">
                                     </div>
 
                                     <div class="mb-3" v-if="filter == 2">
                                         <label class="fw-bold">Analyzer ID</label>
-                                        <input class="form-control" type="text" placeholder="Issue">
+                                        <input class="form-control" type="text" placeholder="Analyzer ID">
                                     </div>
 
                                     <div class="mb-3" v-if="filter == 2">
                                         <label class="fw-bold">HID</label>
-                                        <input v-model="form.hid" class="form-control" type="text" placeholder="Issue">
+                                        <input v-model="form.hid" class="form-control" type="text" placeholder="HID">
                                     </div>
 
                                     <div class="mb-3" v-if="filter == 2">
                                         <label class="fw-bold">Cable Length</label>
-                                        <input v-model="form.cable_length" class="form-control" type="text" placeholder="Issue">
+                                        <input v-model="form.cable_length" class="form-control" type="text" placeholder="Cable Length">
                                     </div>
 
                                     <div class="mb-3" v-if="filter == 2">
                                         <label class="fw-bold">Additional com</label>
-                                        <input v-model="form.additional_com" class="form-control" type="text" placeholder="Issue">
+                                        <input v-model="form.additional_com" class="form-control" type="text" placeholder="Additional Com">
                                     </div>
 
                                     <!-- LIS CIS MODULES -->
@@ -145,68 +147,68 @@
                                         <label class="fw-bold">Tag Module *</label>
                                             <select v-model="form.tag_module_id" class="form-select">
                                                 <option disabled value> Choose One</option>
-                                                <option v-for="module in tag_modules" :key="module" :value="module.id">{{ module.module_name }}</option>
+                                                <option v-for="module in tag_modules" :key="module" :value="module.id"> {{ module.module_name }} </option>
                                             </select>
                                     </div>
 
                                     <!-- Reg Key -->
                                     <div class="mb-3" v-if="filter == 4">
                                         <label class="fw-bold">Outlet ID</label>
-                                        <input type="text" class="form-control">
+                                        <input v-model="form.outlet_id" type="text" class="form-control">
                                     </div>
 
                                     <div class="mb-3" v-if="filter == 4">
                                         <label class="fw-bold">Outlet Name</label>
-                                        <input type="text" class="form-control">
+                                        <input v-model="form.outlet_name" type="text" class="form-control">
                                     </div>
 
                                     <div class="mb-3" v-if="filter == 4">
                                         <label class="fw-bold">Reason For Request</label>
-                                        <textarea class="form-control" type="text" rows="4" placeholder="Details Description"></textarea>
+                                        <textarea v-model="form.reason_reg" class="form-control" type="text" rows="4" placeholder="Details Description"></textarea>
                                     </div>
 
                                     <!-- Report And Data -->
                                     <div class="mb-3" v-if="filter == 5">
                                         <label class="fw-bold">Request Type</label>
                                         <select class="form-control">
-                                            <option>New</option>
-                                            <option>Edit</option>
+                                            <option value="New">New</option>
+                                            <option value="Edit">Edit</option>
                                         </select>
                                     </div>
 
                                     <div class="mb-3" v-if="filter == 5">
                                         <label class="fw-bold">Report ID</label>
-                                        <input type="text" class="form-control">
+                                        <input v-model="form.report_id" type="text" class="form-control">
                                     </div>
 
                                     <div class="mb-3" v-if="filter == 5">
                                         <label class="fw-bold">Report Name</label>
-                                        <textarea type="text" class="form-control" rows="3"></textarea>
+                                        <textarea v-model="form.report_name" type="text" class="form-control" rows="3"></textarea>
                                     </div>
 
                                     <div class="mb-3" v-if="filter == 5">
                                         <label class="fw-bold">PKG</label>
-                                        <textarea type="text" class="form-control" rows="3"></textarea>
+                                        <textarea type="text" v-model="form.pkg" class="form-control" rows="3"></textarea>
                                     </div>
 
                                     <div class="mb-3" v-if="filter == 5">
                                         <label class="fw-bold">Report Type</label>
-                                        <input type="text" class="form-control">
+                                        <input v-model="form.report_type" type="text" class="form-control">
                                     </div>
 
                                     <div class="mb-3" v-if="filter == 5">
                                         <label class="fw-bold">Report Date</label>
-                                        <input type="text" class="form-control">
+                                        <input type="text" v-model="form.report_date" class="form-control">
                                     </div>
 
                                     <div class="mb-3" v-if="filter == 5">
                                         <label class="fw-bold">Purpose</label>
-                                        <textarea type="text" class="form-control" rows="3"></textarea>
+                                        <textarea type="text" v-model="form.purpose" class="form-control" rows="3"></textarea>
                                     </div>
 
                                     <div class="mb-3" v-if="filter == 5">
                                         <label class="fw-bold">Data Displayed</label>
-                                        <textarea type="text" class="form-control" rows="3"></textarea>
+                                        <textarea type="text" v-model="form.data_display" class="form-control" rows="3"></textarea>
                                     </div>
 
                                     <div class="mb-3" v-if="filter == 5">
@@ -229,6 +231,16 @@
                                     <div class="mb-3">
                                         <label class="fw-bold">Issue Summary *</label>
                                         <input v-model="form.title" class="form-control" type="text" rows="4" placeholder="Issue">
+                                    </div>
+
+                                    <!-- <div class="mb-3">
+                                        <label class="fw-bold">File Upload</label>
+                                        <input type="file" multiple ref="file" class="form-control" @change="onChangeFile">
+                                    </div> -->
+
+                                    <div class="mb-3">
+                                        <label class="fw-bold">File Upload</label>
+                                        <input type="file" multiple  @input="form.image = $event.target.files[0]" class="form-control">
                                     </div>
 
                                     <div class="mb-3">
@@ -302,6 +314,7 @@
 
         data: () => ({
             filter: '',
+            postFormData: new FormData(),
         }),
 
         methods: {
@@ -316,6 +329,12 @@
                 //     this.filter = false;
                 // }
             },
+
+            // onFileChange(event) {
+            //     for(var key in event.target.files) {
+            //         this.postFormData.append('images[]', event.target.files[key]);
+            //     }
+            // }
         },
 
         setup(props) {
@@ -332,9 +351,11 @@
                 getBranch: false,
             })
 
-            // const filter = ref({
-            //     filter: ''
-            // })
+            const slas = ref({
+                getSla: false,
+            })
+
+            // const file = ref(['']);
 
             const form = reactive({
                 ticket_source:  '',
@@ -346,7 +367,29 @@
                 customer_id: '',
                 branch_id: '',
                 title: '',
-                description: ''
+                description: '',
+                outlet_id: '',
+                out_name: '',
+                section_id: '',
+                analyzer_id: '',
+                analyzer_name: '',
+                hid: '',
+                cable_length: '',
+                additional_com: '',
+                reason_reg: '',
+                tag_module_id: '',
+                cis_menu_id: '',
+                lis_menu_app: '',
+                reg_report_type: '',
+                report_id: '',
+                report_name: '',
+                pkg: '',
+                report_type: '',
+                report_date: '',
+                purpose: '',
+                file_upload: '',
+                data_display: '',
+                image: ''
             });
 
             onMounted(() => {
@@ -357,7 +400,29 @@
                 .catch(error => {
                     console.log(error.response.data)
                 })
-            })
+
+                // axios.get(`http://localhost:8000/api/sla`).then(response => {
+                // sla.value = response.data.data
+                // })
+                // .catch(error => {
+                //     console.log(error.response.data)
+                // })
+                
+            }) 
+
+            function getSla() {
+                axios.post(`http://localhost:8000/api/sla`, {
+                    id: form.sla_id,
+                }).then(response => {
+                    slas.value = response.data
+                    // console.log(slas)
+                }).then(() => {
+                    this.slas.getSla = true
+                })
+                .catch(error => {
+                    console.log(error.response.data)
+                })
+            }
 
             function getBranch() {
                 axios.post(`http://localhost:8000/api/branch`, {
@@ -382,26 +447,76 @@
                 })
                 .catch(error => {
                     console.log(error.response.data)
-                })
+                })  
+            }
+
+            const onFileChange = () => {
+                    const files = this.files;
+                    const formData = new formData();
+
+                    files.forEach((file) => {
+                        formData.append("selectedFiles", file);
+                    });
+
+                // Array.from(imageData).forEach(image => {
+                //     if(!image.type.match('image.*')) {
+
+                //         setImages([]);
+
+                //         Swal.error({
+                //                 title: 'Gambar Tidak Sesuai Format!',
+                //                 text: 'Fail.',
+                //                 icon: 'error',
+                //                 showConfirmButton: false,
+                //                 timer: 2000
+                //             });
+
+                //             return
+                //     }else{
+                //         setImages([...e.target.files]);
+                //     }
+                // });
             }
             
             const submit = () => {
                 Inertia.post('/apps/master/tickets/store', {
-                    ticket_source:  form.ticket_source,
-                    department_id:  form.department_id,
-                    assign_id:      form.assign_id,
-                    topic_id:       form.topic_id,
-                    sla_id:         form.sla_id,
-                    priority:       form.priority,
-                    customer_id:    form.customer_id,
-                    branch_id:      form.branch_id,
-                    title:          form.title,
-                    description:    form.description,
-                    outlet_id:      form.outlet_id,
-                    analyzer_name:  form.analyzer_name,
-                    hid:            form.hid,
-                    cable_length:   form.cable_length,
-                    additional_com: form.additional_com
+                ticket_source:  form.ticket_source,
+                department_id:  form.department_id,
+                assign_id:      form.assign_id,
+                topic_id:       form.topic_id,
+                sla_id: form.sla_id,
+                priority: form.priority,
+                customer_id: form.customer_id,
+                branch_id: form.branch_id,
+                title: form.title,
+                description: form.description,
+                outlet_id: form.outlet_id,
+                out_name: form.out_name,
+                section_id: form.section_id,
+                analyzer_id: form.analyzer_id,
+                analyzer_name: form.analyzer_name,
+                hid: form.hid,
+                cable_length: form.cable_length,
+                additional_com: form.additional_com,
+                reason_reg: form.reason_reg,
+                tag_module_id: form.tag_module_id,
+                cis_menu_id: form.cis_menu_id,
+                lis_menu_app: form.lis_menu_app,
+                reg_report_type: form.reg_report_type,
+                report_id: form.report_id,
+                report_name: form.report_name,
+                pkg: form.pkg,
+                report_type: form.report_type,
+                report_date: form.report_date,
+                purpose: form.purpose,
+                file_upload: form.file_upload,
+                data_display: form.data_display,
+                image: form.image
+                
+                // Array.from(images).forEach(image => {
+                //     form.image("images[]", image);
+                // });
+
                 }, {
                     onSuccess: () => {
                         Swal.fire({
@@ -418,10 +533,13 @@
             form,
             departments,
             users,
+            slas,
             customers,
             branchs,
             getUser,
             getBranch,
+            onFileChange,
+            getSla,
             submit
         }
         }
