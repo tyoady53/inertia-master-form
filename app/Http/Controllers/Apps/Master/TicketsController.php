@@ -40,6 +40,7 @@ class TicketsController extends Controller
         $cis_menu_apps = Cis_menu_app::get();
         $master_customers = MasterCustomer::get();
         $master_customer = MasterCustomer::where('id', $request->id)->first();
+        $master_customer_branches = MasterCustomerBranch::get();
 
         return Inertia::render('Apps/Tickets/Create', [
             'departments' => $departments,
@@ -50,13 +51,14 @@ class TicketsController extends Controller
             'lis_menu_app'  => $lis_menu_tags,
             'cis_menu_app'  => $cis_menu_apps,
             'master_customers' => $master_customers,
+            'master_customer_branches' => $master_customer_branches,
         ]);
     }
 
     public function store(Request $request)
     {
 
-        // dd($request);
+        // dd(strlen($request->description));
         $this->validate($request, [
             'department_id' => 'required',
             'assign_id' => 'required',
@@ -82,7 +84,7 @@ class TicketsController extends Controller
             $generated = date("ym").'0001';
         }
 
-        // dd($generated,$request,$last_data);
+        dd($generated,$request,$last_data);
 
             Helpdesk::create([
             'thread_id' => $generated,

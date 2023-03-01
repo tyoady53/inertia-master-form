@@ -24,6 +24,7 @@ class CreateMasterTableStructuresTable extends Migration
             $table->text('relate_to')->nullable();
             $table->string('input_type');
             $table->string('required')->default('');
+            $table->string('sequence_id');
             $table->timestamps();
             $table->string('created_by');
 

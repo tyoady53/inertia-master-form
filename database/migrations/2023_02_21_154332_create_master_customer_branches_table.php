@@ -18,6 +18,10 @@ return new class extends Migration
             $table->string('outlet_id');
             $table->unsignedBigInteger('customer_id');
             $table->string('customer_branch');
+            $table->string('status');
+            $table->string('is_show')->default('1');
+            $table->string('created_by');
+            $table->string('updated_by');
             $table->timestamps();
 
             $table->foreign('customer_id')->references('id')->on('master_customers');

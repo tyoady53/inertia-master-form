@@ -15,6 +15,7 @@ class CreateMasterRelation extends Migration
     {
         Schema::create('master_relation', function (Blueprint $table) {
             $table->id();
+            $table->string('relation_id');
             $table->string('table_name_from');
             $table->string('field_from');
             $table->string('table_from_desc');

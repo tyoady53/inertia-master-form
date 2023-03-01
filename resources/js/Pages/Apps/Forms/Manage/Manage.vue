@@ -70,11 +70,11 @@
                                                         <br>
                                                         <br>
                                                     </div>
-                                                    <div v-if="parent_count == '0'">
+                                                    <!-- <div v-if="parent_count == '0'">
                                                         <button class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#parentModal" @click="setParent(header)"> <i class="fas fa-code-branch"></i> Set As Parent</button>
                                                         <br>
                                                         <br>
-                                                    </div>
+                                                    </div> -->
                                                     <button @click.prevent="destroy(form_access.id)" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> DELETE</button>
                                                 </div>
                                             </td>
