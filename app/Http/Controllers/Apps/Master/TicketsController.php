@@ -23,13 +23,17 @@ class TicketsController extends Controller
     public function index()
     {
         $helpdesks = Helpdesk::when(request()->q, function($helpdesks) {
-            $helpdesks = $helpdesks->where('status', 'like', '%'. request()->q . '%');
-        })->where('assign_id', auth()->user()->id)->with('thread', 'topic', 'module', 'sla', 'lis', 'cis', 'user', 'assign', 'customer', 'branch')->get();
+            $helpdesks = $helpdesks->where('status', 'like', '%'. request()->q . '%')
+            ->orWhere('assign_id', request()->q);
+        })->where('created_by',auth()->user()->id)
+        ->with('thread', 'topic', 'module', 'sla', 'lis', 'cis', 'user', 'assign', 'customer', 'branch')->get();
+        $user = auth()->user()->id;
 
         // dd($helpdesks);
 
         return Inertia::render('Apps/Tickets/Index',[
-            'data' => $helpdesks
+            'data' => $helpdesks,
+            'user' => $user
         ]);
     }
 
@@ -85,13 +89,12 @@ class TicketsController extends Controller
         } else {
             $generated = date("ym").'0001';
         }
-            $file_upload = $request->file('file_upload');
-            $file_upload->storeAs('public/helpdesk', $file_upload->hashName());
+            // $file_upload = $request->file('file_upload');
+            // $file_upload->storeAs('public/helpdesk', $file_upload->hashName());
 
             $helpdesk = Helpdesk::create([
             'thread_id'     => $generated,
             'ticket_date'   => date("Ymd"),
-
             'ticket_source' => $request->ticket_source,
             'duedate'       => Carbon::now()->addHours($sla_hours->sla_hour),
             'status'        => 'open',
@@ -123,7 +126,7 @@ class TicketsController extends Controller
             'report_date'   => $request->report_date,
             'purpose'       => $request->purpose,
             'data_display'  => $request->data_display,
-            'file_upload'   => $file_upload->hashName()
+            // 'file_upload'   => $file_upload->hashName()
         ]);
 
         if($request->hasFile('image')) {
@@ -132,11 +135,11 @@ class TicketsController extends Controller
 
             foreach($files as $file) {
 
-                $file->storeAs('public/helpdesk', $file->hashName());
+                $file->storeAs('public/helpdesk/data', $file->hashName());
 
-                $helpdesk->images()->create([
+                $helpdesk->files()->create([
                     'image' => $file->hashName(),
-                    'file_upload_id' => $helpdesk->id 
+                    'file_helpdesk_id' => $helpdesk->id 
                 ]);
             }
         }
@@ -237,7 +240,7 @@ class TicketsController extends Controller
             }
         }
 
-        return back()->with('Data Berhasil Terkirim');
+        return redirect()->route('apps.master.tickets.thread');
     }
 
     public function sla(Request $request)

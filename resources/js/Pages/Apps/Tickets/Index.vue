@@ -19,8 +19,8 @@
                                 </div> -->
                                 <div class="input-group mb-3">
                                     <button @click="handleOpen" value="open" class="btn btn-primary btn-sm me-2"><i class="fa fa-ticket-alt me-1"></i> OPEN</button>
-                                    <button @click="assigned " class="btn btn-primary btn-sm me-2"><i class="fa fa-ticket-alt me-1"></i> ASSIGNED</button>
-                                    <button @click="overdue" class="btn btn-primary btn-sm me-2"><i class="fa fa-ticket-alt me-1"></i> OVERDUE</button>
+                                    <button @click="handleAssigned" class="btn btn-primary btn-sm me-2"><i class="fa fa-ticket-alt me-1"></i> ASSIGNED</button>
+                                    <button @click="handleOverdue" value="overdue" class="btn btn-primary btn-sm me-2"><i class="fa fa-ticket-alt me-1"></i> OVERDUE</button>
                                     <button @click="handleClosed" value="closed" class="btn btn-primary btn-sm me-2"><i class="fa fa-ticket-alt me-1"></i> CLOSED</button>
                                 </div>
                             </form>
@@ -87,15 +87,16 @@
         },
 
         props: {
-            data: Array
+            data: Array,
+            user: Number
         },
 
-        setup() {
+        setup(props) {
 
-            // const search = ref('' || (new URL(document.location)).searchParams.get('q'));
+            console.log(props.user)
 
             const open = ref('open' || (new URL(document.location)).searchParams.get('q'));
-            const assigned = ref('assigned' || (new URL(document.location)).searchParams.get('q'));
+            const assigned = ref(props.user || (new URL(document.location)).searchParams.get('q'));
             const overdue = ref('overdue' || (new URL(document.location)).searchParams.get('q'));
             const closed = ref('closed' || (new URL(document.location)).searchParams.get('q'));
 
@@ -111,12 +112,26 @@
                 });
             }
 
+            const handleAssigned = () => {
+                Inertia.get('/apps/master/tickets', {
+                    q: assigned.value
+                })
+            }
+
+            const handleOverdue = () => {
+                Inertia.get('/apps/master/tickets', {
+                    q: overdue.value
+                })
+            }
+
          return {
             // search,
-            assigned,
-            overdue,
+            // assigned,
+            // overdue,
             handleOpen,
             handleClosed,
+            handleAssigned,
+            handleOverdue
         }
 
         }

@@ -23852,7 +23852,6 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   setup: function setup(props) {
-    var _this3 = this;
     var UrlOrigin = window.location.origin;
     var departments = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)({});
     var users = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)({
@@ -23899,7 +23898,8 @@ __webpack_require__.r(__webpack_exports__);
       purpose: '',
       file_upload: '',
       data_display: '',
-      image: ''
+      image: '',
+      uploadfiles: []
     });
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)(function () {
       axios__WEBPACK_IMPORTED_MODULE_6___default().get(UrlOrigin + "/api/deparments").then(function (response) {
@@ -23920,6 +23920,17 @@ __webpack_require__.r(__webpack_exports__);
         console.log(error.response.data);
       });
     }
+    var fieldChange = function fieldChange(e) {
+      var selectedFiles = e.target.files;
+      console.log(selectedFiles);
+      if (!selectedFiles.length) {
+        return false;
+      }
+      for (var i = 0; i < selectedFiles.length; i++) {
+        form.uploadfiles.push(selectedFiles[i]);
+      }
+      console.log(form.uploadfiles);
+    };
 
     // function getBranch() {
     //     axios.post(UrlOrigin+`/api/branch`, {
@@ -23946,32 +23957,34 @@ __webpack_require__.r(__webpack_exports__);
         console.log(error.response.data);
       });
     }
-    var onFileChange = function onFileChange() {
-      var files = _this3.files;
-      var formData = new formData();
-      files.forEach(function (file) {
-        formData.append("selectedFiles", file);
-      });
 
-      // Array.from(imageData).forEach(image => {
-      //     if(!image.type.match('image.*')) {
+    // const onFileChange = () => {
+    //         const files = this.files;
+    //         const formData = new formData();
 
-      //         setImages([]);
+    //         files.forEach((file) => {
+    //             formData.append("selectedFiles", file);
+    //         });
 
-      //         Swal.error({
-      //                 title: 'Gambar Tidak Sesuai Format!',
-      //                 text: 'Fail.',
-      //                 icon: 'error',
-      //                 showConfirmButton: false,
-      //                 timer: 2000
-      //             });
+    // Array.from(imageData).forEach(image => {
+    //     if(!image.type.match('image.*')) {
 
-      //             return
-      //     }else{
-      //         setImages([...e.target.files]);
-      //     }
-      // });
-    };
+    //         setImages([]);
+
+    //         Swal.error({
+    //                 title: 'Gambar Tidak Sesuai Format!',
+    //                 text: 'Fail.',
+    //                 icon: 'error',
+    //                 showConfirmButton: false,
+    //                 timer: 2000
+    //             });
+
+    //             return
+    //     }else{
+    //         setImages([...e.target.files]);
+    //     }
+    // });
+    // }
 
     var submit = function submit() {
       _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_3__.Inertia.post('/apps/master/tickets/store', {
@@ -24006,7 +24019,7 @@ __webpack_require__.r(__webpack_exports__);
         purpose: form.purpose,
         file_upload: form.file_upload,
         data_display: form.data_display,
-        image: form.image
+        image: form.uploadfiles
       }, {
         onSuccess: function onSuccess() {
           sweetalert2__WEBPACK_IMPORTED_MODULE_5___default().fire({
@@ -24027,8 +24040,9 @@ __webpack_require__.r(__webpack_exports__);
       customers: customers,
       // branchs,
       // getBranch,
+      // onFileChange,
       getUser: getUser,
-      onFileChange: onFileChange,
+      fieldChange: fieldChange,
       getSla: getSla,
       submit: submit
     };
@@ -24063,13 +24077,13 @@ __webpack_require__.r(__webpack_exports__);
     Link: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.Link
   },
   props: {
-    data: Array
+    data: Array,
+    user: Number
   },
-  setup: function setup() {
-    // const search = ref('' || (new URL(document.location)).searchParams.get('q'));
-
+  setup: function setup(props) {
+    console.log(props.user);
     var open = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)('open' || 0);
-    var assigned = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)('assigned' || 0);
+    var assigned = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(props.user || new URL(document.location).searchParams.get('q'));
     var overdue = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)('overdue' || 0);
     var closed = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)('closed' || 0);
     var handleOpen = function handleOpen() {
@@ -24082,12 +24096,24 @@ __webpack_require__.r(__webpack_exports__);
         q: closed.value
       });
     };
+    var handleAssigned = function handleAssigned() {
+      _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_3__.Inertia.get('/apps/master/tickets', {
+        q: assigned.value
+      });
+    };
+    var handleOverdue = function handleOverdue() {
+      _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_3__.Inertia.get('/apps/master/tickets', {
+        q: overdue.value
+      });
+    };
     return {
       // search,
-      assigned: assigned,
-      overdue: overdue,
+      // assigned,
+      // overdue,
       handleOpen: handleOpen,
-      handleClosed: handleClosed
+      handleClosed: handleClosed,
+      handleAssigned: handleAssigned,
+      handleOverdue: handleOverdue
     };
   }
 });
@@ -30846,7 +30872,6 @@ var _hoisted_24 = {
   "class": "col-md-4"
 };
 var _hoisted_25 = {
-  key: 0,
   "class": "mb-3"
 };
 var _hoisted_26 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
@@ -31240,7 +31265,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       key: department.id,
       value: department.id
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(department.name), 9 /* TEXT, PROPS */, _hoisted_23);
-  }), 128 /* KEYED_FRAGMENT */))], 544 /* HYDRATE_EVENTS, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $setup.form.department_id]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [$setup.users.getUser ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_25, [_hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  }), 128 /* KEYED_FRAGMENT */))], 544 /* HYDRATE_EVENTS, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $setup.form.department_id]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [_hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
       return $setup.form.assign_id = $event;
     }),
@@ -31250,7 +31275,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       key: user.id,
       value: user.id
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(user.name), 9 /* TEXT, PROPS */, _hoisted_28);
-  }), 128 /* KEYED_FRAGMENT */))], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $setup.form.assign_id]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [_hoisted_30, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  }), 128 /* KEYED_FRAGMENT */))], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $setup.form.assign_id]])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [_hoisted_30, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "form-select",
     "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
       return $setup.form.topic_id = $event;
@@ -31462,11 +31487,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     placeholder: "Issue"
   }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $setup.form.title]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_134, [_hoisted_135, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "file",
-    onInput: _cache[33] || (_cache[33] = function ($event) {
-      return $setup.form.file_upload = $event.target.files[0];
-    }),
-    "class": "form-control"
-  }, null, 32 /* HYDRATE_EVENTS */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_136, [_hoisted_137, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Editor, {
+    id: "uploadfiles",
+    ref: "uploadfiles",
+    multiple: "",
+    "class": "form-control",
+    onChange: _cache[33] || (_cache[33] = function () {
+      return $setup.fieldChange && $setup.fieldChange.apply($setup, arguments);
+    })
+  }, null, 544 /* HYDRATE_EVENTS, NEED_PATCH */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_136, [_hoisted_137, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Editor, {
     id: "file-picker",
     "api-key": "no-api-key",
     modelValue: $setup.form.description,
@@ -31475,7 +31503,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     init: {
       menubar: false,
-      plugins: 'image code emoticons preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars',
+      plugins: 'image',
+      // plugins: 'image code emoticons preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars',
       image_title: true,
       automatic_uploads: false,
       images_upload_url: '/api/upload-image',
@@ -31641,13 +31670,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "btn btn-primary btn-sm me-2"
   }, _hoisted_15), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: _cache[1] || (_cache[1] = function () {
-      return $setup.assigned && $setup.assigned.apply($setup, arguments);
+      return $setup.handleAssigned && $setup.handleAssigned.apply($setup, arguments);
     }),
     "class": "btn btn-primary btn-sm me-2"
   }, _hoisted_18), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: _cache[2] || (_cache[2] = function () {
-      return $setup.overdue && $setup.overdue.apply($setup, arguments);
+      return $setup.handleOverdue && $setup.handleOverdue.apply($setup, arguments);
     }),
+    value: "overdue",
     "class": "btn btn-primary btn-sm me-2"
   }, _hoisted_21), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: _cache[3] || (_cache[3] = function () {
@@ -32020,7 +32050,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     modelValue: $setup.form.description,
     "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
       return $setup.form.description = $event;
-    })
+    }),
+    init: {
+      menubar: false,
+      plugins: 'image',
+      image_title: true,
+      automatic_uploads: false,
+      images_upload_url: '/api/upload-image',
+      toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image | code | emoticons |'
+    }
   }, null, 8 /* PROPS */, ["modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_98, [_hoisted_99, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "file",
     id: "uploadfiles",

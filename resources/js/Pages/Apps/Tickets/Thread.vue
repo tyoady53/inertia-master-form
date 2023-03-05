@@ -131,6 +131,14 @@
                                         <label class="fw-bold">Note Details</label>
                                         <Editor
                                         v-model="form.description"
+                                        :init="{
+                                                menubar: false,
+                                                plugins: 'image',
+                                                image_title: true,
+                                                automatic_uploads: false, 
+                                                images_upload_url: '/api/upload-image',
+                                                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image | code | emoticons |',
+                                            }"
                                         >
                                         </Editor>
                                     </div>

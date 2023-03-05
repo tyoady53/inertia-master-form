@@ -36,7 +36,7 @@
                                         </div>
 
                                         <div class="col-md-4">
-                                            <div class="mb-3" v-if="users.getUser">
+                                            <div class="mb-3">
                                                 <label class="fw-bold">Assign To</label>
                                                 <select v-model="form.assign_id" class="form-select">
                                                     <option disabled value> Choose One</option>
@@ -261,7 +261,7 @@
 
                                     <div class="mb-3">
                                         <label class="fw-bold">File Upload</label>
-                                        <input type="file"  @input="form.file_upload = $event.target.files[0]" class="form-control">
+                                        <input type="file" id="uploadfiles" ref="uploadfiles" multiple class="form-control" @change="fieldChange">
                                     </div>
 
                                     <div class="mb-3">
@@ -271,7 +271,8 @@
                                             v-model="form.description"
                                             :init="{
                                                 menubar: false,
-                                                plugins: 'image code emoticons preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars',
+                                                plugins: 'image',
+                                                // plugins: 'image code emoticons preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars',
                                                 image_title: true,
                                                 automatic_uploads: false, 
                                                 images_upload_url: '/api/upload-image',
@@ -418,7 +419,8 @@
                 purpose: '',
                 file_upload: '',
                 data_display: '',
-                image: ''
+                image: '',
+                uploadfiles: [],
             });
 
             onMounted(() => {
@@ -444,6 +446,24 @@
                     console.log(error.response.data)
                 })
             }
+
+            const fieldChange = (e) => {
+
+                let selectedFiles = e.target.files;
+
+                console.log(selectedFiles)
+
+                if(!selectedFiles.length) {
+                    return false;
+                }
+
+                for(let i=0;i<selectedFiles.length;i++){
+                        form.uploadfiles.push(selectedFiles[i]);
+                    }
+
+                console.log(form.uploadfiles)
+
+                }
 
             // function getBranch() {
             //     axios.post(UrlOrigin+`/api/branch`, {
@@ -471,13 +491,13 @@
                 })  
             }
 
-            const onFileChange = () => {
-                    const files = this.files;
-                    const formData = new formData();
+            // const onFileChange = () => {
+            //         const files = this.files;
+            //         const formData = new formData();
 
-                    files.forEach((file) => {
-                        formData.append("selectedFiles", file);
-                    });
+            //         files.forEach((file) => {
+            //             formData.append("selectedFiles", file);
+            //         });
 
                 // Array.from(imageData).forEach(image => {
                 //     if(!image.type.match('image.*')) {
@@ -497,7 +517,7 @@
                 //         setImages([...e.target.files]);
                 //     }
                 // });
-            }
+            // }
             
             const submit = () => {
                 Inertia.post('/apps/master/tickets/store', {
@@ -532,7 +552,8 @@
                 purpose: form.purpose,
                 file_upload: form.file_upload,
                 data_display: form.data_display,
-                image: form.image
+                image: form.uploadfiles
+
                 }, {
                     onSuccess: () => {
                         Swal.fire({
@@ -553,8 +574,9 @@
             customers,
             // branchs,
             // getBranch,
+            // onFileChange,
             getUser,
-            onFileChange,
+            fieldChange,
             getSla,
             submit
         }

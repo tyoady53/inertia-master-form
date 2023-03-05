@@ -81,7 +81,7 @@ Route::prefix('apps')->group(function() {
                 Route::post('/branch', [TicketsController::class, 'create']);
                 Route::post('/store', [TicketsController::class, 'store'])->name('apps.master.tickets.store');
                 Route::get('/{ticket:thread_id}/thread', [TicketsController::class, 'show'])->name('apps.master.tickets.show');
-                Route::post('/thread', [TicketsController::class, 'thread'])->name('apps.master.ticket.thread');
+                Route::post('/thread', [TicketsController::class, 'thread'])->name('apps.master.tickets.thread');
             });
         });
     });

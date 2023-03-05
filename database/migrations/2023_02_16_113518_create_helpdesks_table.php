@@ -49,7 +49,6 @@ return new class extends Migration
             $table->dateTime('report_date')->nullable();
             $table->text('purpose')->nullable();
             $table->text('data_display')->nullable();
-            $table->string('file_upload')->nullable();
             $table->unsignedBigInteger('created_by');
             $table->unsignedBigInteger('edited_by')->nullable();
             $table->timestamps();

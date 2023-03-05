@@ -70,7 +70,7 @@ class Helpdesk extends Model
 
     public function files()
     {
-        return $this->hasMany(FileUpload::class);
+        return $this->hasMany(file_helpdesk::class, 'file_helpdesk_id');
     }
 
 }
