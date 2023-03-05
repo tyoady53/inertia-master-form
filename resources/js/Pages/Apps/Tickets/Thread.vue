@@ -78,8 +78,8 @@
                         </div>
                         <div class="card-body shadow">
                                 <div v-html="data.description"></div>
-                            <div class="alert alert-secondary m-1 p-2">
-                                <a :href="`/storage/helpdesk/${data.file_upload}`" target="_blank" >{{ data.file_upload }}</a>
+                            <div v-for="file in data.files" :key="file" class="alert alert-secondary m-1 p-2">
+                                <a :href="`/storage/helpdesk/data/${file.image}`" target="_blank" >{{ file.image }}</a>
                             </div>
                         </div>
                     </div>
@@ -101,7 +101,7 @@
                             </div>
                             <div class="card">
                                 <div class="card-body">
-                                  <div v-html="thread.description" />
+                                  <div v-html="thread.description"/>
                                     <div v-for="file in thread.files" :key="file" class="alert alert-secondary m-1 p-2">
                                         <a :href="`/storage/helpdesk/${file.image}`" target="_blank">{{ file.image }}</a>
                                     </div>
@@ -259,6 +259,9 @@ export default {
                             timer: 2000
                         });
                     },
+                    function() {
+                        location.reload();
+                    }
                 });
             }
 

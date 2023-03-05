@@ -17,6 +17,8 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use ParagonIE\ConstantTime\Hex;
+use PHPUnit\TextUI\Help;
 
 class TicketsController extends Controller
 {
@@ -143,6 +145,13 @@ class TicketsController extends Controller
                 ]);
             }
         }
+            Helpdesk_thread::create([
+                'heldesk_id'    => $generated,
+                'title'         => 'System',
+                'description'   => '',
+                'assign_id'     => '1',
+                'created_by'    => $request->assign_id
+            ]);
 
         return redirect()->route('apps.master.tickets.index');
     }
@@ -184,7 +193,7 @@ class TicketsController extends Controller
     public function show($thread_id) 
     {
 
-        $thread = Helpdesk::with('user', 'topic', 'assign', 'sla', 'division', 'thread')->where('thread_id', $thread_id)->first();
+        $thread = Helpdesk::with('user', 'topic', 'assign', 'sla', 'division', 'thread', 'files')->where('thread_id', $thread_id)->first();
         $threads = Helpdesk_thread::with('user', 'files')->where('helpdesk_id', $thread_id)->orderBy('id', 'ASC')->get();
 
         // dd($threads);
@@ -239,8 +248,11 @@ class TicketsController extends Controller
                 ]);
             }
         }
+            Helpdesk::where('thread_id',$request->helpdesk_id)->update([
+                'assign_id' => $request->assign_id
+            ]);
 
-        return redirect()->route('apps.master.tickets.thread');
+        return redirect()->back()->with('Success');
     }
 
     public function sla(Request $request)
