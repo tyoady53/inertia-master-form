@@ -17,8 +17,6 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use ParagonIE\ConstantTime\Hex;
-use PHPUnit\TextUI\Help;
 
 class TicketsController extends Controller
 {
@@ -86,11 +84,12 @@ class TicketsController extends Controller
                 $generated = date("ym").'0001';
             }else{
                 $generated = $last_data->thread_id+1;
-
             }
         } else {
             $generated = date("ym").'0001';
         }
+
+        // dd($generated);
             // $file_upload = $request->file('file_upload');
             // $file_upload->storeAs('public/helpdesk', $file_upload->hashName());
 
@@ -115,12 +114,12 @@ class TicketsController extends Controller
             'analyzer_name' => $request->analyzer_name,
             'hid'           => $request->hid,
             'cable_length'  => $request->cable_length,
-            'additional_com'    => $request->additional_com,
+            'additional_com'=> $request->additional_com,
             'reason_reg'    => $request->reason_request,
             'tag_module_id' => $request->tag_module_id,
             'cis_menu_id'   => $request->cis_menu_id,
             'lis_menu_app'  => $request->lis_menu_app,
-            'reg_report_type'   => $request->reg_report_type,
+            'reg_report_type' => $request->reg_report_type,
             'report_id'     => $request->report_id,
             'report_name'   => $request->report_name,
             'pkg'           => $request->pkg,
@@ -130,6 +129,12 @@ class TicketsController extends Controller
             'data_display'  => $request->data_display,
             // 'file_upload'   => $file_upload->hashName()
         ]);
+        // dd($helpdesk);
+
+        // if($helpdesk) {
+            
+        // }
+
 
         if($request->hasFile('image')) {
 
@@ -145,13 +150,26 @@ class TicketsController extends Controller
                 ]);
             }
         }
-            Helpdesk_thread::create([
-                'heldesk_id'    => $generated,
-                'title'         => 'System',
-                'description'   => '',
-                'assign_id'     => '1',
-                'created_by'    => $request->assign_id
-            ]);
+        
+
+        // $sla_hours = Sla_plan::where('id', $request->sla_id)->first();
+        // $last_data = Helpdesk::latest('created_at')->first();
+        // if($last_data){
+        //     if(substr($last_data->thread_id,0,5)==date("ym")){
+        //         $generated = date("ym").'0001';
+        //     }else{
+        //         $generated = $last_data->thread_id+1;
+        //     }
+        // } else {
+        //     $generated = date("ym").'0001';
+        // }
+        Helpdesk_thread::create([
+            'helpdesk_id'    => $helpdesk->thread_id,
+            'title'         => 'System',
+            'description'   => '',
+            'assign_id'     => '1',
+            'created_by'    => $request->assign_id
+        ]);
 
         return redirect()->route('apps.master.tickets.index');
     }

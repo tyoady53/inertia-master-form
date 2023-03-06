@@ -24081,7 +24081,6 @@ __webpack_require__.r(__webpack_exports__);
     user: Number
   },
   setup: function setup(props) {
-    console.log(props.user);
     var open = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)('open' || 0);
     var assigned = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(props.user || new URL(document.location).searchParams.get('q'));
     var overdue = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)('overdue' || 0);

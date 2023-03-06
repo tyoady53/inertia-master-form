@@ -92,9 +92,6 @@
         },
 
         setup(props) {
-
-            console.log(props.user)
-
             const open = ref('open' || (new URL(document.location)).searchParams.get('q'));
             const assigned = ref(props.user || (new URL(document.location)).searchParams.get('q'));
             const overdue = ref('overdue' || (new URL(document.location)).searchParams.get('q'));
