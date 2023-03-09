@@ -13,13 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('helpdesk_threads', function (Blueprint $table) {
+        Schema::create('file_helpdesks', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('helpdesk_id');
-            $table->text('title');
-            $table->text('description');
-            $table->unsignedBigInteger('assign_id');
-            $table->unsignedBigInteger('created_by');
+            $table->unsignedBigInteger('file_helpdesk_id');
+            $table->string('image');
             $table->timestamps();
         });
     }
@@ -31,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('helpdesk_threads');
+        Schema::dropIfExists('file_helpdesks');
     }
 };
