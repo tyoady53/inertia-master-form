@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Apps;
 
 use App\Http\Controllers\Controller;
 use App\Models\Extend;
+use App\Models\master_table;
+use App\Models\master_table_structure;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -21,6 +24,7 @@ class ExtendController extends Controller
         if(auth()){
             $user_id = auth()->user()->id;
         }
+        $extend = array();
         $data   = DB::table($name)
             ->join('master_assignment', $name.'.index_id', '=', "master_assignment.index_id")
             ->select($name.'.*')
@@ -31,12 +35,20 @@ class ExtendController extends Controller
             // dd($data->status_report);
         $ts = User::where('id',$data->created_by)->first();
 
-        $extend = Extend::with('user','files')->where('index_id',$id)->get();
+        $datas = Extend::with('user','files')->where('index_id',$id)->get();
+        foreach($datas as $d){
+            $extend[] = ['index_id' => $d->index_id, 'description' => $d->description, 'created_at' => date_format($d->created_at,"Y-m-d H:i:s") , 'name' => $d['user']->name];
+        }
+        // dd($data,$extend);
+
+        $table_selected = master_table::where('name',$name)->first();
+        $header = master_table_structure::where('table_id',$table_selected->id)->get();
 
         if($data->index_id){
             return inertia('Apps/Forms/Extend/Index', [
                 'data'          => $data,
                 'extend'        => $extend,
+                'headers'       => $header,
                 'treat_starter' => $ts,
                 'ticket'        => $id,
                 'table'         => $name,
@@ -69,8 +81,9 @@ class ExtendController extends Controller
     public function store(Request $request,$name,$id)
     {
         $select = DB::table('master_tables')->where('name',$name)->first();
+        $data_table = DB::table($name )->where('index_id',$id)->first();
         $data   = Extend::create(['table_id'=>$select->id,'index_id'=>$id,'description'=>$request->description,'created_by'=>auth()->user()->id]);
-        $insert = DB::statement("UPDATE $name SET status_report = '$request->status_report' WHERE index_id='$id';");
+        $insert = DB::statement("UPDATE $name SET status_report = '$request->status_report',created_at = '$data_table->created_at' WHERE index_id='$id';");
 
         if($data){
             return redirect()->route('apps.master.forms.extend_index',[$name,$id]);
@@ -94,9 +107,9 @@ class ExtendController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request)
     {
-        //
+        
     }
 
     /**

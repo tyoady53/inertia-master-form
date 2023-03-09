@@ -116,7 +116,7 @@
                                         <label class="fw-bold">Section ID</label>
                                         <input class="form-control" type="text" placeholder="Issue">
                                     </div>
-                                    
+
                                     <div class="mb-3" v-if="filter == 1">
                                         <label class="fw-bold">Analyzer Name</label>
                                         <input v-model="form.analyzer_name" class="form-control" type="text" placeholder="Issue">
@@ -261,7 +261,8 @@
 
                                     <div class="mb-3">
                                         <label class="fw-bold">File Upload</label>
-                                        <input type="file"  @input="form.file_upload = $event.target.files[0]" class="form-control">
+                                        <input type="file"  @input="form.file_upload[$event.target.files]" class="form-control">
+                                        <!-- <input type="file"  @input="form.file_upload = $event.target.files[0]" class="form-control"> -->
                                     </div>
 
                                     <div class="mb-3">
@@ -416,7 +417,7 @@
                 report_type: '',
                 report_date: '',
                 purpose: '',
-                file_upload: '',
+                file_upload: [],
                 data_display: '',
                 image: ''
             });
@@ -429,11 +430,10 @@
                 .catch(error => {
                     console.log(error.response.data)
                 })
-                
-            }) 
+            })
 
             function getSla() {
-                axios.post(`http://localhost:8000/api/sla`, {
+                axios.post(UrlOrigin+`/api/sla`, {
                     id: form.sla_id,
                 }).then(response => {
                     slas.value = response.data
@@ -498,7 +498,7 @@
                 //     }
                 // });
             }
-            
+
             const submit = () => {
                 Inertia.post('/apps/master/tickets/store', {
                 ticket_source:  form.ticket_source,
@@ -559,7 +559,7 @@
             submit
         }
         }
-        
+
     }
 </script>
 

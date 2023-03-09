@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Apps\Master\FormController;
 use App\Http\Controllers\Apps\Master\TicketsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -24,3 +25,5 @@ Route::post('/sla', [TicketsController::class, 'sla']);
 Route::post('/user', [TicketsController::class, 'getUser']);
 Route::post('/branch', [TicketsController::class, 'getBranch']);
 Route::get('/users', [TicketsController::class, 'getUsers']);
+Route::post('/upload', [TicketsController::class, 'upload']);
+Route::get('/{form:slug}/dynamic_table/{id}', [FormController::class, 'getDataTable_API']);

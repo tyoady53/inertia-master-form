@@ -101,7 +101,6 @@
         },
 
         setup(props) {
-         
             const form = reactive({
                 name: props.role.name,
                 permissions: props.role.permissions.map(obj => obj.name),
@@ -110,12 +109,10 @@
             const submit = () => {
 
                 Inertia.put(`/apps/roles/${props.role.id}`, {
-                  
                     name: form.name,
                     permissions: form.permissions,
                 }, {
                     onSuccess: () => {
-                       
                         Swal.fire({
                             title: 'Success!',
                             text: 'Role updated successfully.',

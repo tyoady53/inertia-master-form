@@ -61,6 +61,7 @@ class TicketsController extends Controller
 
     public function store(Request $request)
     {
+        dd($request);
         $this->validate($request, [
             'department_id' => 'required',
             'assign_id' => 'required',
@@ -142,6 +143,18 @@ class TicketsController extends Controller
         }
 
         return redirect()->route('apps.master.tickets.index');
+    }
+
+    public function upload(Request $request){
+        $file_upload = $request->file('file_upload');
+        $upload = $file_upload->storeAs('public/helpdesk', $file_upload->hashName());
+        if($upload){
+            return response()->json([
+                'success'   => true,
+                'message'   => 'Upload Success',
+                'data'      => $upload
+            ]);
+        }
     }
 
     public function getDepartments()
@@ -232,7 +245,7 @@ class TicketsController extends Controller
 
                 $helpdesk_thread->files()->create([
                     'image' => $file->hashName(),
-                    'file_upload_id' => $helpdesk_thread->id 
+                    'file_upload_id' => $helpdesk_thread->id
                 ]);
             }
         }
@@ -245,7 +258,7 @@ class TicketsController extends Controller
         // dd($request);
         $sla_hour = Sla_plan::where('id', $request->id)->first();
         $time = Carbon::now()->addHours($sla_hour->sla_hour);
-        
+
         return response()->json([
             'success'   => true,
             'message'   => 'Time SLA Time :'.$sla_hour->sla_hour.' Hours(s)',

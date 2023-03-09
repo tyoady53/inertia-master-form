@@ -3,6 +3,10 @@ import { createInertiaApp } from '@inertiajs/inertia-vue3'
 
 import { InertiaProgress } from '@inertiajs/progress'
 
+// import pagination from 'laravel-vue-pagination'
+
+// Vue.component('pagination', require('laravel-vue-pagination'));
+
 createInertiaApp({
   resolve: name => require(`./Pages/${name}`),
   setup({ el, App, props, plugin }) {

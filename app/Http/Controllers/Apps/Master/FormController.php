@@ -16,6 +16,8 @@ use App\Models\MasterCustomerBranch;
 use App\Models\MasterParentChild;
 use App\Models\MasterTable;
 use App\Models\PublicModel;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
 use Spatie\Permission\Models\Permission;
 
 class FormController extends Controller
@@ -86,7 +88,7 @@ class FormController extends Controller
         }else{
             $status = '0';
         }
-        
+
         if($request->customer){
             $customer = '1';
             $base .= "customer_id varchar(255),customer_branch varchar(255),";
@@ -154,12 +156,26 @@ class FormController extends Controller
         } else {
             $relate_to = '';
         }
+        $can_copy = '';$required = '';
         $field_name = str_replace(array(' ', '-', ',', '.', '/'), '',strtolower($request->name));
         $table_name = $request->table;
         $data_type      = DB::table('master_datatype')->where('name',$request->data_type)->first();
         $table_selected = DB::table('master_tables')->where('name',$table_name)->first();
         $master_table_structure = master_table_structure::where('table_id',$table_selected->id)->orderBy('sequence_id','DESC')->first();
+        if($master_table_structure){
+            $last_sequence = $master_table_structure->sequence_id;
+        } else {
+            $last_sequence = 0;
+        }
+        if($request->can_copy){
+            $can_copy = 1;
+        }
+        if($request->required){
+            $required = 'required';
+        }
         $structure = new master_table_structure;
+        $structure->can_copy            = $can_copy;
+        $structure->required            = $required;
         $structure->table_id            = $table_selected->id;
         $structure->field_name          = $field_name;
         $structure->field_description   = $request->name;
@@ -168,7 +184,7 @@ class FormController extends Controller
         $structure->field_name          = $field_name;
         $structure->relation            = '0';
         $structure->input_type          = $request->data_type;
-        $structure->sequence_id         = $master_table_structure->sequence_id + 1;
+        $structure->sequence_id         = $last_sequence + 1;
         $structure->relate_to           = $relate_to;
         $structure->created_by          = auth()->user()->id;
         $structure->save();
@@ -183,6 +199,44 @@ class FormController extends Controller
         DB::statement($query);
 
         return redirect()->route('apps.master.forms.manage',$table_name);
+    }
+
+    public function edit(Request $request)
+    {
+        // dd($request);
+        $can_copy = '';$required = '';
+        $data = ''; $updated_row = '';
+        $selected_row = master_table_structure::where('id',$request->id)->first();
+        if($selected_row->sequence_id < $request->sequence_id){
+            $data = master_table_structure::where('table_id',$selected_row->table_id)->where('sequence_id','<=',$request->sequence_id)->where('sequence_id','>',$selected_row->sequence_id)->where('sequence_id','!=',$selected_row->sequence_id)->get();
+
+        }elseif($selected_row->sequence_id > $request->sequence_id){
+            $data = master_table_structure::where('table_id',$selected_row->table_id)->where('sequence_id','>=',$request->sequence_id)->where('sequence_id','<',$selected_row->sequence_id)->where('sequence_id','!=',$selected_row->sequence_id)->get();
+        }
+        if($data){
+            if($selected_row->sequence_id < $request->sequence_id){
+                foreach($data as $d){
+                    master_table_structure::where('id', $d->id)->update(['sequence_id' => $d->sequence_id-1]);
+                    // $updated_row .= 'Field '.$d->field_description.' with seq '.$d->sequence_id.' will updated to '.$d->sequence_id-1 .' with id '.$d->id.' #';
+                }
+            }elseif($selected_row->sequence_id > $request->sequence_id){
+                foreach($data as $d){
+                    master_table_structure::where('id', $d->id)->update(['sequence_id' => $d->sequence_id+1]);
+                    // $updated_row .= 'Field '.$d->field_description.' with seq '.$d->sequence_id.' will updated to '.$d->sequence_id+1 .' with id '.$d->id.' #';
+                }
+            }
+        }
+        if($request->can_copy){
+            $can_copy = 1;
+        }
+        if($request->required){
+            $required = 'required';
+        }
+        $update_row = master_table_structure::where('id', $selected_row->id)->update(['sequence_id' => $request->sequence_id,'can_copy' => $can_copy,'required'=>$required,'field_description'=>$request->field_description]);
+
+        if($update_row){
+            return redirect()->route('apps.master.forms.manage',$request->table);
+        }
     }
 
     public function set_relation(Request $request)
@@ -272,6 +326,7 @@ class FormController extends Controller
 
     public function show(Request $request, $name)
     {
+        $relation = '';
         $use_parent = '0';
         $data_ = array();
         $result = array();
@@ -298,52 +353,19 @@ class FormController extends Controller
                 }
             }
         }
-        $select_field = '';$form = ''; $relate = '';$table_to_check = [];$parent = [];$child = [];
-        $select = $public_model->get_single_data_single_filter('master_tables','name',$name);//DB::table('master_tables')->where('name',$name)->first();
+        $form = array(); $test = array();
+        $select_field = '';$raw_form = ''; $relate = '';$table_to_check = [];$parent = [];$child = [];
+        $select = $public_model->get_single_data_single_filter('master_tables','name',$name);
         $table_name = $select->description;
         $title  = DB::table('master_table_structures')->where('table_id',$select->id)->where('is_show',1)->get();
-        // dd($title->count());
         $header = DB::table('master_table_structures')->where('table_id',$select->id)->where('is_show',1)->orderBy('sequence_id','asc')->get();
-        if ($title->count() > 0){
-            $relation = $public_model->get_table_single_filter('master_relation','table_name_from',$name); //DB::table('master_relation')->whereRaw('')->get();
+        if ($title){
+            $relation = $public_model->get_table_single_filter('master_relation','table_name_from',$name);
 			foreach ($title as $index => $t){
                 $select_field .= $t->field_name.',';
-                // if($t->relate_to != ''){
-                //     // if($t->relate_to != 'Customers#Parent'){
-                //     //     dd($t->relate_to);
-                //     // }
-                //     if($t->relate_to != 'Customers#Child' || $t->relate_to != 'Customers#Parent'){
-                //         if(str_contains($t->input_type, 'Child')){
-                //             $relate_table = DB::table('master_parent_child')->where('index_id',explode('#',$t->relate_to)[0])->first();
-                //             if($relate_table){
-                //                 $check_data = DB::table($relate_table->relate_to)->get();
-                //                 foreach ($check_data as $chk_data){
-                //                     $child[$t->input_type][$relate_table->field_name] = $check_data;
-                //                 }
-                //             }
-                //         } else if (str_contains($t->input_type, 'Parent')){
-                //             $relate_table = DB::table('master_parent_child')->where('index_id',explode('#',$t->relate_to)[0])->first();
-                //             if($relate_table){
-                //                 $check_data = DB::table($relate_table->relate_to)->get();
-                //                 foreach ($check_data as $chk_data){
-                //                     $parent[$t->input_type][$relate_table->field_name] = $check_data;
-                //                 }
-                //             }
-                //         } else {
-                //             $relations = $t->relate_to;
-                //             $relate_table = explode('#',$relations);
-                //             $field_check = $relate_table[1];
-                //             $check_data = DB::table($relate_table[0])->get([$field_check]);
-                //             foreach ($check_data as $chk_data){
-                //                 $table_to_check[$t->input_type][$field_check] = $check_data;
-                //             }
-                //         }
-                //     }
-                // }
                 if($relation->count() > 0){
                     foreach ($relation as $rel){
                         if($rel->relation_id == $t->relate_to){
-                            // $result[] = [$rel->relation_id => DB::table($rel->table_name_to)->get(),"field_from" => $rel->field_from];
                             $result[$rel->relation_id] = DB::table($rel->table_name_to)->get();
                         }
                     }$relate = 'yes';
@@ -352,30 +374,7 @@ class FormController extends Controller
                 }
 			}
 			$selected = 'id,created_at,'.substr($select_field, 0,-1);
-            if($select->extend){
-                if(str_contains(strtolower($user->getRoleNames()), 'staff')){
-                    $form = DB::table($name)
-                        ->join('master_assignment', $name.'.index_id', '=', "master_assignment.index_id")
-                        ->select($name.'.*')
-                        ->where('master_assignment.user_id',$user_id)
-                        ->union(DB::table($name)->where('created_by',$user_id))->orderBy('id','DESC')
-                        ->get();
-                } else {
-                    $form = DB::table($name)->selectRaw('index_id,'.$selected)->where('status','1')->latest()->get();
-                }
-            } else {
-                if(str_contains(strtolower($user->getRoleNames()), 'staff')){
-                    $form = DB::table($name)->selectRaw($selected)->where('created_by',$user_id)->where('status','1')->latest()->get();
-                } else {
-                    if($name == 'master_customers'){
-                        $form = DB::table($name)->selectRaw($selected)->orderBy('customer_name','ASC')->get();
-                    } else if($name == 'master_customer_branches'){
-                        $form = DB::table($name)->join('master_customers', $name.'.customer_id', '=', "master_customers.id")->orderBy('customer_name','ASC')->orderBy('outlet_id','ASC')->get();
-                    } else {
-                        $form = DB::table($name)->latest()->get();
-                    }
-                }
-            }
+            $raw_form = $this->getDataTable($name);
 		} else {
             $form = DB::table($name)->latest()->get();
         }
@@ -411,16 +410,102 @@ class FormController extends Controller
                 }
             }
             if(str_contains($he->input_type, 'Checklist')){
-                $checklist_data[explode('#',$he->relate_to)[0]] = [explode('#',$he->relate_to)[0] => $public_model->get_all_table_data(explode('#',$he->relate_to)[0])/*DB::table(explode('#',$he->relate_to)[0])->get()*/,"field_from" => explode('#',$he->relate_to)[1]];
+                $checklist_data[explode('#',$he->relate_to)[0]] = [explode('#',$he->relate_to)[0] => $public_model->get_all_table_data(explode('#',$he->relate_to)[0]),"field_from" => explode('#',$he->relate_to)[1]];
             }
             if($he->relate_to == 'Customers#Parent'){
                 $use_parent = '1';
             }
         }
         if($name == 'master_customer_branches' || $use_parent == '1'){
-            $data_ = ['parent' => MasterCustomer::orderBy('customer_name','ASC')->get(), 'child' => MasterCustomerBranch::get()];
+            $data_ = ['parent' => MasterCustomer::orderBy('customer_name','ASC')->get(), 'child' => MasterCustomerBranch::orderBy('customer_id','ASC')->orderBy('customer_branch','ASC')->get()];
         }
-        // dd($result);
+        if($name == 'master_customers'){
+            $form = DB::table($name)->orderBy('customer_name','ASC')->get();
+        } else if($name == 'master_customer_branches'){
+            $form = DB::table($name)->join('master_customers', $name.'.customer_id', '=', "master_customers.id")->orderBy('customer_name','ASC')->orderBy('outlet_id','ASC')->get();
+        } else{
+            foreach($raw_form as $idx => $raw){
+                foreach($header as $h) {
+                    if($select->extend == '1'){
+                        $test['index_id'] = $raw->index_id;
+                    }
+                    if($select->status == '1'){
+                        $test['status_report'] = $raw->status_report;
+                    }
+                    $field_name = $h->field_name;
+                    if(explode($h->input_type,'#')[0] === 'Parent'){
+                        $parent_key = $parent_data[0];
+                        $parent_data = $parent_data[$parent_key];
+                        if(explode($h->relate_to,'#')[0] == $parent_key){
+                            foreach($parent_data as $parent){
+                                if($parent->id == $raw->$field_name){
+                                    $test[$h->field_name] = $parent[explode($h->relate_to,'#')[1]];
+                                }
+                            }
+                        }
+                    }
+                    else if(explode($h->input_type,'#')[0] === 'Child'){
+                        foreach($child_data as $child){
+                            if($raw->$field_name == $child->id){
+                                $test[$h->field_name] = $child[explode($h->relate_to,'#')[1]];
+                            }
+                        }
+                    }
+                    else if($h->relation === '1'){
+                        $parent_key = $result;
+                        foreach($parent_key as $index => $key){
+                            if($h->relate_to == $index){
+                                // dd($result[$index],$raw->$field_name,$relation);
+                                foreach($relation as $rel){
+                                    if($rel->relation_id == $index){
+                                        $refer_to = $rel->refer_to;
+                                        foreach($result[$index] as $sel){
+                                            if($sel->id == $raw->$field_name){
+                                                $test[$h->field_name] = $sel->$refer_to;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else if($h->input_type == 'Today Date'){
+                        $test[$h->field_name] = $h->created_at;
+                    }
+                    else if($h->input_type == 'Longtext'){
+                        $test[$h->field_name] = $raw->$field_name;
+                    }
+                    else if($h->input_type == 'File'){
+                        if($raw->$field_name){
+                            $test[$h->field_name] = $raw->$field_name;
+                        } else {
+                            $test[$h->field_name] = NULL;
+                        }
+                    }
+                    else{
+                        if($h->relate_to){
+                            if($h->relate_to == 'Customers#Parent'){
+                                foreach($data_['parent'] as $parent){
+                                    if($raw->$field_name == $parent->id){
+                                        $test[$h->field_name] = $parent->customer_name;
+                                    }
+                                }
+                            }else if($h->relate_to == 'Customers#Child'){
+                                foreach($data_['child'] as $child){
+                                    if($raw->$field_name == $child->id){
+                                        $test[$h->field_name] = $child->customer_branch;
+                                    }
+                                }
+                            }
+                        }else{
+                            $test[$h->field_name] = $raw->$field_name;
+                        }
+                    }
+                }
+                $form[$idx] = $test;
+            }
+        }
+        // dd($header,$raw_form,$form,$rel,$parent_key);
         $field  = DB::table('master_datatype')->get();
         $show_table  = DB::table('master_tables')->where('is_show',1)->get();
         $structures  = DB::table('master_table_structures')->where('is_show',1)->get();
@@ -431,7 +516,7 @@ class FormController extends Controller
                 'edit_data'     => 'form-'.$name.'.edit',
                 'delete_data'   => 'form-'.$name.'.delete',
                 'csrfToken'     => csrf_token(),
-                'table_name'    => $table_name,
+                'table_name'    => $select,
                 'title'         => $title,
                 'fields'        => $field,
                 'headers'       => $header,
@@ -443,7 +528,7 @@ class FormController extends Controller
                 'relation'      => $relation,
                 'related'       => $result,
                 'relate'        => $relate,
-                'avail_tables'  => DB::table('master_tables')->where('is_show',1)->where('name','<>',$name)->get(),
+                'avail_tables'  => DB::table('master_tables')->where('is_show',1)->where('name','!=',$name)->get(),
                 'structures'    => $structures,
                 'parent_data'   => $parent_data,
                 'child_data'    => $child_data,
@@ -482,6 +567,7 @@ class FormController extends Controller
                             'divisions'     => DB::table('master_divisions')->where('id','!=','1')->where('id','!=',auth()->user()->division)->get(),
                             'users'         => DB::table('users')->where('id','!=',auth()->user()->id)->get(),
                             'data'          => $data_,
+                            'userID'        => auth()->user()->id,
                         ]);
                         break;
                     case 'add_data' :
@@ -511,6 +597,298 @@ class FormController extends Controller
             ]);
         }
     }
+
+    function getDataTable($name){
+        $user_id = 1;
+        // if(auth()){
+        //     $user_id = auth()->user()->id;
+        // }
+        $user = User::where('id',$user_id)->first();
+        $public_model = new PublicModel();
+        $select = $public_model->get_single_data_single_filter('master_tables','name',$name);
+        if($select->extend){
+            if(str_contains(strtolower($user->getRoleNames()), 'staff')){
+                $form = DB::table($name)
+                    ->join('master_assignment', $name.'.index_id', '=', "master_assignment.index_id")
+                    ->select($name.'.*')
+                    ->where('master_assignment.user_id',$user_id)
+                    ->union(DB::table($name)->where('created_by',$user_id))->orderBy('id','DESC')
+                    ->get();
+            } else {
+                $form = DB::table($name)->latest()->get();
+            }
+        } else {
+            if(str_contains(strtolower($user->getRoleNames()), 'staff')){
+                $form = DB::table($name)->where('created_by',$user_id)->latest()->get();
+            } else {
+                $form = DB::table($name)->latest()->get();
+            }
+        }
+
+        return $form;
+    }
+
+    function get_user(){
+        return auth()->user()->id;
+    }
+
+    function getDataTable_API($name, $id){
+        // $user_id = $this->get_user();
+        // dd($user_id, $name);
+        $per_page=request()->per_page;
+        $result = array();
+        $array_data = array();
+        $array_ = array();
+        $select_field = '';
+        $user_id = $id;
+        $user = User::where('id','1')->first();
+        $public_model = new PublicModel();
+        $select = $public_model->get_single_data_single_filter('master_tables','name',$name);
+        if($select->extend){
+            if(str_contains(strtolower($user->getRoleNames()), 'staff')){
+                $form = DB::table($name)
+                    ->join('master_assignment', $name.'.index_id', '=', "master_assignment.index_id")
+                    ->select($name.'.*')
+                    ->where('master_assignment.user_id',$user_id)
+                    ->union(DB::table($name)->where('created_by',$user_id))->orderBy('id','DESC')
+                    ->get();
+            } else {
+                $form = DB::table($name)->latest()->get();
+            }
+        } else {
+            if(str_contains(strtolower($user->getRoleNames()), 'staff')){
+                $form = DB::table($name)->where('created_by',$user_id)->latest()->get();
+            } else {
+                $form = DB::table($name)->latest()->get();
+            }
+        }
+        $raw_form = $this->getDataTable($name);
+        $header = DB::table('master_table_structures')->where('table_id',$select->id)->where('is_show',1)->orderBy('sequence_id','asc')->get();
+        $parent_data  = array();
+        $child_data   = array();
+        foreach ($header as $he){
+            if(str_contains($he->input_type, 'Parent')){
+                if($he->relate_to != 'Customers#Parent'){
+                    $relate_table = DB::table('master_parent_child')->where('index_id',explode('#',$he->relate_to)[0])->first();
+                    $data = explode('#',$he->relate_to)[0];
+                    $table_reference_id = explode('.',$data)[2];
+                    $table_reference_name = DB::table('master_tables')->where('id',$table_reference_id)->first();
+                    $reference_structure = DB::table('master_table_structures')->where('table_id',$table_reference_id)->get();
+                    if($public_model->get_table_single_filter('master_relation','table_name_from',$table_reference_name->name)->count() > 0){
+                        foreach ($reference_structure as $chk_data){
+                            $m = DB::table('master_relation')->where('table_name_from',$relate_table->relate_to)->get();
+                            foreach($m as $n){
+                                $z = $n->table_name_to;
+                                $parent_data = [$data => DB::table($z)->get()];
+                            }
+                        }
+                    } else {
+                        $parent_data = [$data => DB::table($relate_table->relate_to)->groupBy($relate_table->field_name)->get()];
+                    }
+                }
+            }
+            if(str_contains($he->input_type, 'Child')){
+                if($he->relate_to != 'Customers#Child'){
+                    $relate_table = DB::table('master_parent_child')->where('index_id',explode('#',$he->relate_to)[0])->first();
+                    $child_data  = DB::table($relate_table->relate_to)->get();
+                }
+            }
+            if(str_contains($he->input_type, 'Checklist')){
+                $checklist_data[explode('#',$he->relate_to)[0]] = [explode('#',$he->relate_to)[0] => $public_model->get_all_table_data(explode('#',$he->relate_to)[0])/*DB::table(explode('#',$he->relate_to)[0])->get()*/,"field_from" => explode('#',$he->relate_to)[1]];
+            }
+            if($he->relate_to == 'Customers#Parent'){
+                $use_parent = '1';
+            }
+        }
+
+        $title  = DB::table('master_table_structures')->where('table_id',$select->id)->where('is_show',1)->get();
+        $header = DB::table('master_table_structures')->where('table_id',$select->id)->where('is_show',1)->orderBy('sequence_id','asc')->get();
+        if ($title){
+            $relation = $public_model->get_table_single_filter('master_relation','table_name_from',$name);
+			foreach ($title as $index => $t){
+                $select_field .= $t->field_name.',';
+                if($relation->count() > 0){
+                    foreach ($relation as $rel){
+                        if($rel->relation_id == $t->relate_to){
+                            $result[$rel->relation_id] = DB::table($rel->table_name_to)->get();
+                        }
+                    }$relate = 'yes';
+                } else {
+                    $relate = 'no';
+                }
+			}
+			$selected = 'id,created_at,'.substr($select_field, 0,-1);
+            $raw_form = $this->getDataTable($name);
+		} else {
+            $form = DB::table($name)->latest()->get();
+        }
+
+        if($name == 'master_customer_branches'){
+            $data_ = ['parent' => MasterCustomer::orderBy('customer_name','ASC')->get(), 'child' => MasterCustomerBranch::orderBy('customer_id','ASC')->orderBy('customer_branch','ASC')->get()];
+        }
+        if($name == 'master_customers'){
+            $paginator = MasterCustomer::when(request()->q, function($paginator) {
+                $paginator = $paginator->where('customer_name', 'like', '%'. request()->q . '%');
+            })->orderBy('customer_name','ASC')->paginate($per_page);
+        } else if($name == 'master_customer_branches'){
+            $paginator = MasterCustomerBranch::join('master_customers', 'master_customer_branches.customer_id', '=', "master_customers.id")->when(request()->q, function($paginator) {
+                $paginator = $paginator->where('master_customers.customer_name', 'like', '%'. request()->q . '%')
+                    ->orWhere('customer_branch', 'like', '%'. request()->q . '%')
+                    ->orWhere('outlet_id', 'like', '%'. request()->q . '%');
+            })->orderBy('master_customers.customer_name','ASC')->orderBy('outlet_id','ASC')->paginate($per_page);
+            // $paginator = MasterCustomerBranch::with('customer_name')->orderBy('customer_name','ASC')->orderBy('outlet_id','ASC')->paginate(5);
+        } else{
+            foreach($raw_form as $idx => $raw){
+                foreach($header as $h) {
+                    if($select->extend == '1'){
+                        $test['index_id'] = $raw->index_id;
+                    }
+                    if($select->status == '1'){
+                        $test['status_report'] = $raw->status_report;
+                    }
+                    $field_name = $h->field_name;
+                    if(explode($h->input_type,'#')[0] === 'Parent'){
+                        $parent_key = $parent_data[0];
+                        $parent_data = $parent_data[$parent_key];
+                        if(explode($h->relate_to,'#')[0] == $parent_key){
+                            foreach($parent_data as $parent){
+                                if($parent->id == $raw->$field_name){
+                                    $test[$h->field_name] = $parent[explode($h->relate_to,'#')[1]];
+                                }
+                            }
+                        }
+                    }
+                    else if(explode($h->input_type,'#')[0] === 'Child'){
+                        foreach($child_data as $child){
+                            if($raw->$field_name == $child->id){
+                                $test[$h->field_name] = $child[explode($h->relate_to,'#')[1]];
+                            }
+                        }
+                    }
+                    else if($h->relation === '1'){
+                        $parent_key = $result;
+                        foreach($parent_key as $index => $key){
+                            if($h->relate_to == $index){
+                                // dd($result[$index],$raw->$field_name,$relation);
+                                foreach($relation as $rel){
+                                    if($rel->relation_id == $index){
+                                        $refer_to = $rel->refer_to;
+                                        foreach($result[$index] as $sel){
+                                            if($sel->id == $raw->$field_name){
+                                                $test[$h->field_name] = $sel->$refer_to;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else if($h->input_type == 'Today Date'){
+                        $test[$h->field_name] = $h->created_at;
+                    }
+                    else if($h->input_type == 'Longtext'){
+                        $test[$h->field_name] = $raw->$field_name;
+                    }
+                    else if($h->input_type == 'File'){
+                        if($raw->$field_name){
+                            $test[$h->field_name] = $raw->$field_name;
+                        } else {
+                            $test[$h->field_name] = NULL;
+                        }
+                    }
+                    else{
+                        if($h->relate_to){
+                            $data_ = ['parent' => MasterCustomer::orderBy('customer_name','ASC')->get(), 'child' => MasterCustomerBranch::orderBy('customer_id','ASC')->orderBy('customer_branch','ASC')->get()];
+                            if($h->relate_to == 'Customers#Parent'){
+                                foreach($data_['parent'] as $parent){
+                                    if($raw->$field_name == $parent->id){
+                                        $test[$h->field_name] = $parent->customer_name;
+                                    }
+                                }
+                            }else if($h->relate_to == 'Customers#Child'){
+                                foreach($data_['child'] as $child){
+                                    if($raw->$field_name == $child->id){
+                                        $test[$h->field_name] = $child->customer_branch;
+                                    }
+                                }
+                            }
+                        }else{
+                            $test[$h->field_name] = $raw->$field_name;
+                        }
+                    }
+                }
+                $array_[$idx] = $test;
+            }
+            if(request()->page){
+                $currentPage = request()->page; // The index page.
+            } else {
+                $currentPage = 1;
+            }
+            $data_header = $header;
+            if(request()->q){
+                // if($select->extend == '1'){
+                //     $header->add("{'id'=>0,'table_id'=>0,'field_name'=>'index_id'}");
+                // }
+                $selected_arr = array();
+                foreach ($array_ as $key => $val) {
+                    foreach($data_header as $h){
+                        if (str_contains(strtolower($val[$h->field_name]),strtolower(request()->q))) {
+                            $selected_arr[] = $key;
+                        }
+                    }
+                }
+                $a = array_unique($selected_arr);
+                foreach ($a as $key) {
+                    $array_data[] = $array_[$key];
+                }
+            }else{
+                $array_data = $array_;
+            }
+            // dd($select->extend,$header);
+            $perPage = $per_page; // How many items do you want to display.
+            $offSet = ($currentPage * $perPage) - $perPage;
+            $itemsForCurrentPage = array_slice($array_data, $offSet, $perPage, true);
+            $total = count($array_data);
+            $paginator = new LengthAwarePaginator($itemsForCurrentPage, $total, $perPage, $currentPage);
+        }
+        // dd($paginator);
+
+        if($paginator){
+            return response()->json([
+                'success'   => true,
+                'message'   => 'Data',
+                'data'      => [
+                    'forms'=>$paginator,
+                    'headers'=>$header
+                ]
+            ]);
+        }
+        return response()->json([
+            'success'   => true,
+            'message'   => 'Data',
+            'data'      => 'cannot find data'
+        ]);
+    }
+
+    function myfunction($products, $field, $value)
+    {
+        foreach($products as $key => $product) {
+            if ( $product[$field] === $value )
+                return $key;
+         }
+        return false;
+    }
+
+    function searchForId($id, $array,$headers) {
+        foreach ($array as $key => $val) {
+            foreach($headers as $h){
+                if (str_contains($val[$h->field_name],$id)) {
+                    return $key;
+                }
+            }
+        }
+        return null;
+     }
 
     public function create_data(Request $request){
         // dd($request);
@@ -547,8 +925,14 @@ class FormController extends Controller
             $fields = $t->field_name;
             $select_field .= $t->field_name.',';
             if($t->input_type == 'File'){
-                $file= $request->file($fields)->store('public/'.$table.'-'.$fields);
-                $values .= "'".str_replace('public/', '',$file)."',";
+                // dd($request->file($fields));
+                $file= $request->file($fields);
+                if($file){
+                    $save_file = $file->store('public/'.$table.'-'.$fields);
+                    $values .= "'".str_replace('public/', '',$save_file)."',";
+                }else{
+                    $values .= "NULL,";
+                }
             } else if($t->input_type == 'Checklist'){
                 if($request->$fields == ''){
                     $values .= "NULL,";

@@ -74,7 +74,7 @@
                                 <span class="font-weight-bold"><i class="fa fa-shield-alt"></i> {{ data.title }}</span>
                         </div>
                         <div class="card-body shadow">
-                                <span class="font-weight-bold"><i class="fa fa-refresh"></i>Ticket Thread</span>      
+                                <span class="font-weight-bold"><i class="fa fa-refresh"></i>Ticket Thread</span>
                         </div>
                         <div class="card-body shadow">
                                 <div v-html="data.description"></div>
@@ -89,25 +89,24 @@
                 <div v-for="thread in threads" :key="thread" class="col-md-12">
                     <div class="card border-0 rounded-3 shadow border-top-purple">
                         <div class="card-header">
-                                <div class="row">
-                                    <div class="d-flex docs-highlight">
-                                        <div class="pt-0 w-82 docs-highlight">{{ thread.title }}</div>
-                                        <div class="p-0 flex-shrink-2">{{ thread.user.name }}</div>
-                                    </div>
-                                    <div class="d-flex docs-highlight">
-                                        <div class="p-0 flex-shrink-2">{{ thread.created_at }}</div>
-                                    </div>
+                            <div class="row">
+                                <div class="d-flex docs-highlight">
+                                    <div class="pt-0 w-82 docs-highlight">{{ thread.title }}</div>
+                                    <div class="p-0 flex-shrink-2">{{ thread.user.name }}</div>
+                                </div>
+                                <div class="d-flex docs-highlight">
+                                    <div class="p-0 flex-shrink-2">{{ thread.created_at }}</div>
                                 </div>
                             </div>
-                            <div class="card">
-                                <div class="card-body">
-                                  <div v-html="thread.description" />
-                                    <div v-for="file in thread.files" :key="file" class="alert alert-secondary m-1 p-2">
-                                        <a :href="`/storage/helpdesk/${file.image}`" target="_blank">{{ file.image }}</a>
-                                    </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <div v-html="thread.description" />
+                                <div v-for="file in thread.files" :key="file" class="alert alert-secondary m-1 p-2">
+                                    <a :href="`/storage/helpdesk/${file.image}`" target="_blank">{{ file.image }}</a>
                                 </div>
-                                
                             </div>
+                        </div>
                     </div>
                 </div>
             </div>

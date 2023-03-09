@@ -41,38 +41,25 @@ Route::prefix('apps')->group(function() {
         Route::prefix('master')->group( function() {
             Route::prefix('forms')->group( function() {
                 Route::get('', [FormController::class, 'index'])->name('apps.master.forms.index');
-
                 Route::get('/create', [FormController::class, 'create'])->name('apps.master.forms.create');
-
+                Route::get('/get_user', [FormController::class, 'get_user'])->name('apps.master.forms.get_user');
                 Route::post('/new_form', [FormController::class, 'create_form'])->name('apps.master.forms.new_form');
-
                 Route::get('/{form:slug}/manage', [FormController::class, 'show'])->name('apps.master.forms.manage');
-
                 Route::post('/add_column', [FormController::class, 'add_column'])->name('apps.master.forms.add_column');
-
+                Route::post('/edit_field', [FormController::class, 'edit'])->name('apps.master.forms.edit_field');
                 Route::post('/set_parent', [FormController::class, 'set_parent'])->name('forms.master.forms.set_parent');
-
                 Route::post('/add_relation', [FormController::class, 'set_relation'])->name('forms.master.forms.add_relation');
-
                 Route::get('/{form:slug}/show', [FormController::class, 'show'])->name('apps.master.forms.show');
-
                 Route::post('/new_data', [FormController::class, 'create_data'])->name('apps.master.forms.new_data');
-
                 Route::post('/update_data', [FormController::class, 'update_data'])->name('apps.master.forms.update_data');
-
                 Route::delete('/{form:slug}/delete_data/{id}', [FormController::class, 'delete_data']);
-
                 Route::get('/{form:slug}/extend/{id}', [ExtendController::class, 'index'])->name('apps.master.forms.extend_index');
-
                 Route::post('/{form:slug}/add_extend/{id}', [ExtendController::class, 'store'])->name('apps.master.forms.extend_store');
             });
             Route::prefix('reports')->group( function() {
                 Route::get('', [ReportController::class, 'index'])->name('apps.master.reports.index');
-
                 Route::get('/{form:slug}/show', [ReportController::class, 'show'])->name('apps.master.reports.show');
-
                 Route::get('/{form:slug}/filter', [ReportController::class, 'generate_report'])->name('apps.master.reports.filter');
-
                 Route::get('/{form:slug}/export', [ReportController::class, 'export'])->name('apps.master.reports.export');
             });
             Route::prefix('tickets')->group( function() {

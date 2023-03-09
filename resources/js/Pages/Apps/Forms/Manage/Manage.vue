@@ -1,6 +1,6 @@
 <template>
     <Head>
-        <title>MANAGE - {{ table_name }}</title>
+        <title>MANAGE - {{ table_name.description }}</title>
     </Head>
     <main class="c-main">
         <div class="container-fluid">
@@ -9,7 +9,7 @@
                     <div class="col-md-12">
                         <div class="card border-0 rounded-3 shadow border-top-purple">
                             <div class="card-header">
-                                <span class="font-weight-bold"><i class="fa fa-plus"></i> MANAGE :: {{ table_name }}</span>
+                                <h5><span class="font-weight-bold"><i class="fa fa-cog"></i> MANAGE :: {{ table_name.description }}</span></h5>
                             </div>
                             <div class="card-body">
                                 <button data-bs-toggle="modal" data-bs-target="#addFieldModal" class="btn btn-primary btn-sm me-2" type="button">Add Field</button>
@@ -44,7 +44,10 @@
                                     </thead>
                                     <tbody>
                                         <tr v-for="header in headers">
-                                            <td> {{ header.field_description }}</td>
+                                            <td>
+                                                <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editFieldModal" @click="sendInfo(header)"><i class="fa fa-edit"></i></button>
+                                                {{ header.field_description }}
+                                            </td>
                                             <td v-if="header.relation === '0'">
                                                 <div v-if="header.input_type.split('#')[0] === 'Parent'">Parent</div>
                                                 <div v-else-if="header.input_type.split('#')[0] === 'Child'">Child</div>
@@ -59,23 +62,23 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td> <input type="number" name="_token" :value="header.sequence_id"> </td>
-                                            <td> {{ header.input_type }} <br>
-                                                <button class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#datatypeModal" @click="changeType(header)"> <i class="fa fa-link   me-1"></i> Change Data Type</button>
+                                            <td class="text-center">
+                                                {{ header.sequence_id }}
+                                            </td>
+                                            <td class="text-center"> {{ header.input_type }}
                                             </td>
                                             <td class="text-center">
                                                 <div>
-                                                    <div v-if="header.relation === '0'">
-                                                        <button class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#relationModal" @click="sendInfo(header)"> <i class="fa fa-link   me-1"></i> Add Relation</button>
-                                                        <br>
-                                                        <br>
+                                                    <div>
+                                                        <button  v-if="header.relation === '0'" class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#relationModal" @click="sendInfo(header)"> <i class="fa fa-link me-1"></i> Add Relation</button>
+                                                        <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editFieldModal" @click="sendInfo(header)"><i class="fa fa-edit"></i></button>
+                                                        <button @click.prevent="destroy(header.id)" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> DELETE</button>
                                                     </div>
                                                     <!-- <div v-if="parent_count == '0'">
                                                         <button class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#parentModal" @click="setParent(header)"> <i class="fas fa-code-branch"></i> Set As Parent</button>
                                                         <br>
                                                         <br>
                                                     </div> -->
-                                                    <button @click.prevent="destroy(form_access.id)" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> DELETE</button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -214,11 +217,21 @@
                                     <option v-for="types in filteredTypes" :value="types.id">{{ types.description }}</option>
                                 </select>
                                 <div v-if="filteredChecklistTable.length">
-                                <label>Select Field</label>
-                                <select class="form-control" id="relate_to_field" name="field_to">
-                                    <option v-for="chk in filteredChecklistTable" :value="chk.field_name">{{ chk.field_description }}</option>
-                                </select>
+                                    <label>Select Field</label>
+                                    <select class="form-control" id="relate_to_field" name="field_to">
+                                        <option v-for="chk in filteredChecklistTable" :value="chk.field_name">{{ chk.field_description }}</option>
+                                    </select>
+                                </div>
                             </div>
+                            <div class="col-lg-3 m-2">
+                                &nbsp
+                                <input class="form-check-input" type="checkbox" id="required" name="required">
+                                <label class="form-check-label" for="required">Required</label>
+                            </div>
+                            <div class="col-lg-3 m-2" v-if="table_name.use_clipboard == '1'">
+                                &nbsp
+                                <input class="form-check-input" type="checkbox" id="can_copy" name="can_copy">
+                                <label class="form-check-label" for="can_copy">Can Copy</label>
                             </div>
                             <br>
                             <div class="modal-footer">
@@ -232,6 +245,66 @@
             </div>
         </div>
         <!-- End of Modal Add Column -->
+
+        <!-- The Modal Edit Column -->
+        <div class="modal" id="editFieldModal" ref="editFieldModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Edit Column</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <form action="/apps/master/forms/edit_field/" method="post">
+                            <input class="form-control" :value="table" type="hidden" name="table">
+                            <input class="form-control" :value="selected_field.id" type="hidden" name="id">
+                            <input type="hidden" name="_token" :value="csrfToken">
+                            <div>
+                                <label>field Name</label>
+                                <input class="form-control" type="text" name="field_description" :value="selected_field.field_description">
+                            </div>
+                            <div>
+                                <label>Sequence</label>
+                                <input class="form-control" type="text" name="sequence_id" :value="selected_field.sequence_id">
+                            </div>
+                            <div class="col-lg-3 m-2">
+                                &nbsp
+                                <div v-if="selected_field.required">
+                                    <input class="form-check-input" type="checkbox" checked="checked" id="required" name="required">
+                                    <label class="form-check-label" for="required">Required</label>
+                                </div>
+                                <div v-else>
+                                    <input class="form-check-input" type="checkbox" id="required" name="required">
+                                    <label class="form-check-label" for="required">Required</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 m-2" v-if="table_name.use_clipboard == '1'">
+                                &nbsp
+                                <div v-if="selected_field.can_copy == '1'">
+                                    <input class="form-check-input" type="checkbox" checked="checked" id="can_copy" name="can_copy">
+                                    <label class="form-check-label" for="can_copy">Can Copy</label>
+                                </div>
+                                <div v-else>
+                                    <input class="form-check-input" type="checkbox" id="can_copy" name="can_copy">
+                                    <label class="form-check-label" for="can_copy">Can Copy</label>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="modal-footer">
+                                <button class="btn btn-primary" type="submit"> Update </button>
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Modal footer -->
+                </div>
+            </div>
+        </div>
+        <!-- End of Modal Edit Column -->
 
         <!-- The Modal Change Data Type -->
         <div class="modal" id="datatypeModal" ref="datatypeModal">
@@ -298,7 +371,7 @@
             errors: Object,
             roles: Array,
             table: String,
-            table_name: String,
+            table_name: Object,
             headers: Array,
             create_data: String,
             edit_data: String,

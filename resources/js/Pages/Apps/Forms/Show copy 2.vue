@@ -15,8 +15,9 @@
                                 <form>
                                     <div class="input-group mb-3">
                                         <Link href="#" v-if="hasAnyPermission([create_data])" class="btn btn-primary input-group-text" data-bs-toggle="modal" data-bs-target="#add_dataModal" @click="newData"> <i class="fa fa-plus-circle me-2"></i> Add Data</Link>
-                                        <input type="text" class="form-control" placeholder="Search Data" v-model="search">
-                                        <button class="btn btn-primary input-group-text" @click="getFormData"> <i class="fa fa-search me-2"></i> SEARCH</button>
+                                        <input type="text" class="form-control" placeholder="Search Data">
+
+                                        <button class="btn btn-primary input-group-text" type="submit"> <i class="fa fa-search me-2"></i> SEARCH</button>
                                     </div>
                                     <div class="input-group mb-3" >
                                         <div class="input-group mb-3" v-if="hasAnyPermission(['form.create'])">
@@ -25,21 +26,15 @@
                                     </div>
                                 </form>
                                 <div style="overflow-x:auto;">
-                                    <!-- <DynamicTable/> -->
-                                    <vue-good-table
-                                        :columns="columns"
-                                        :rows="forms"
-                                    ></vue-good-table>
-                                    <!-- {{ table_heads_use }} -->
                                     <table class="table table-striped table-bordered table-hover">
                                         <thead>
-                                            <th class="text-center" v-if="extend == '1'"  style="width:130px;"> #ID </th>
+                                            <th class="text-center" v-if="extend == '1'"> #ID </th>
                                             <th class="text-center" v-for="header in headers" :key="header"> {{ header.field_description }}</th>
                                             <th class="text-center" v-if="status_report == '1'">Status</th>
                                             <th class="text-center" v-if="extend == '1'"> Action </th>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="form in table_data.data" :key="form">
+                                            <tr v-for="form in forms" :key="form">
                                                 <template v-if="table == 'master_customer_branches'">
                                                     <td>
                                                         {{ form.outlet_id }}
@@ -52,43 +47,116 @@
                                                     </td>
                                                 </template>
                                                 <template v-else>
-                                                    <td v-for="header in table_heads">
-                                                        <div v-if="header.value=='index_id'">
-                                                            <Link :href="`/apps/master/forms/${table}/extend/${form.index_id}`" v-if="form.index_id" class="btn btn-success btn-sm me-2"><i class="fa fa-expand"></i> {{ form.index_id }}</Link>
-                                                        </div>
-                                                        <div v-else>
-                                                            <div v-if="header.type === 'Longtext'">
-                                                                <div v-if="form[header.value].length > 100">
-                                                                    <p v-html="form[header.value].substring(0,100)+ ' ...'"></p>
-                                                                </div>
-                                                                <div v-else>
-                                                                    <p v-html="form[header.value]"></p>
+                                                    <td class="text-center" v-if="extend == '1'" style="width:130px;">
+                                                        <Link :href="`/apps/master/forms/${table}/extend/${form.index_id}`" v-if="form['index_id']" class="btn btn-success btn-sm me-2"><i class="fa fa-expand"></i> {{ form.index_id }}</Link>
+                                                    </td>
+                                                    <td v-for="header in headers" :key="header">
+                                                        <div v-if="header.input_type.split('#')[0] === 'Parent'">
+                                                            <div v-for="parent,index in parentData">
+                                                                <div v-if="header.relate_to.split('#')[0] == index">
+                                                                    <div v-for="p in parent">
+                                                                        <div v-if="p.id == form[header.field_name]">
+                                                                            {{ p[header.relate_to.split('#')[1]] }}
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                            <div v-else-if="header.type === 'File'">
-                                                                <div v-if="form[header.value]">
-                                                                    <a :href="`/storage/${form[header.value]}`" target="_blank" >{{ "..."+form[header.value].substring(form[header.value].length-15,form[header.value].length) }}</a>
+                                                        </div>
+                                                        <div v-else-if="header.input_type.split('#')[0] === 'Child'">
+                                                            <div v-for="child in child_data">
+                                                                <div v-if="form[header.field_name] == child.id">
+                                                                    {{ child[header.relate_to.split('#')[1]] }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div v-else-if="header.relation === '1'">
+                                                            <div v-if="header.relate_to.includes('R.')">
+                                                                <div v-for="rel_data in relation">
+                                                                    <div v-if="rel_data.relation_id == header.relate_to">
+                                                                        <div v-for="rel,index in related">
+                                                                            <div v-if="index == header.relate_to">
+                                                                                <div v-for="option in rel">
+                                                                                    <div v-if="option.id == form[header.field_name]">
+                                                                                        {{option[rel_data.refer_to]}}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!-- <div v-if="header.relate_to">
+                                                                <div v-for="rel,index in related" :key="rel">
+                                                                    <div v-if="relation[0].refer_to ==  index">
+                                                                        <div v-for="r in rel" :key="r">
+                                                                            <div v-if="r.id == form[header.field_name]">
+                                                                                {{ r[index] }}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div v-else>
-                                                                <p v-html="form[header.value]"></p>
+                                                                <div>
+                                                                    <div v-for="rel,index in related" :key="rel">
+                                                                        <div v-if="relation[0].field_from ==  index">
+                                                                            <div v-for="r in rel" :key="r">
+                                                                                <div v-if="r.id == form[header.field_name]">
+                                                                                    {{ r[relation[0].refer_to] }}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div> -->
+                                                        </div>
+                                                        <div v-else-if="header.relate_to === 'Customers#Parent'">
+                                                            <div v-for="r in data['parent']" :key="r">
+                                                                <div v-if="r.id == form[header.field_name]">
+                                                                    {{ r.customer_name }}
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </td>
-                                                    <td class="text-center" v-if="table_name.use_clipboard == '1'">
-                                                        <div>
-                                                            <button class="btn btn-success btn-sm me-2" @click="copy(form.index_id)">Copy</button>
+                                                        <div v-else-if="header.relate_to === 'Customers#Child'">
+                                                            <div v-for="r in data['child']" :key="r">
+                                                                <div v-if="r.id == form[header.field_name]">
+                                                                    {{ r.customer_branch }}
+                                                                </div>
+                                                            </div>
                                                         </div>
+                                                        <div v-else-if="header.input_type === 'Today Date'">
+                                                            {{ form.created_at }}
+                                                        </div>
+                                                        <div v-else-if="header.input_type === 'Longtext'">
+                                                            <div v-if="form[header.field_name].length > 100">
+                                                                <p>{{ form[header.field_name].substring(0,100)+' ...' }}</p>
+                                                            </div>
+                                                            <div v-else>
+                                                                {{ form[header.field_name] }}
+                                                            </div>
+                                                        </div>
+                                                        <div v-else-if="header.input_type === 'File'">
+                                                            <div v-if="form[header.field_name]">
+                                                                <a :href="`/storage/${form[header.field_name]}`" target="_blank" >{{ "..."+form[header.field_name].substring(form[header.field_name].length-15,form[header.field_name].length) }}</a>
+                                                            </div>
+                                                        </div>
+                                                        <div v-else>
+                                                            {{ form[header.field_name]  }}
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center">{{ form.status_report }}</td>
+                                                    <td class="text-center">
+                                                        <div v-if="table_name.use_clipboard == '1'">
+                                                            <button class="btn btn-success btn-sm me-2" @click="copy(form.id)">Copy</button>
+                                                        </div>
+                                                        <!-- <div v-if="extend == '1'" >
+                                                            <Link :href="`/apps/master/forms/${table}/extend/${form.index_id}`" v-if="form['index_id']" class="btn btn-success btn-sm me-2"><i class="fa fa-expand"></i> Open Data</Link>
+                                                        </div> -->
                                                     </td>
                                                 </template>
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <div class="row mt-4">
-                                        <div class="col-sm-6 offset-5">
-                                            <pagination :data="table_data" @pagination-change-page="getFormData"></pagination>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -289,6 +357,15 @@
                                                             </div>
                                                             <div v-else-if="header.input_type === 'Longtext'">
                                                                 <label class="fw-bold">{{ header.field_description }}</label>
+                                                                <!-- <Editor
+                                                                :name="header.field_name"
+                                                                api-key="no-api-key"
+                                                                    :init="{
+                                                                        menubar: false,
+                                                                        plugins: 'code emoticons preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link codesample charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars',
+                                                                        toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | code | emoticons |',
+                                                                    }">
+                                                                </Editor> -->
                                                                 <textarea class="form-control" :name="header.field_name" type="number" :placeholder="header.field_description" :required="header.required == 'required'"></textarea>
                                                             </div>
                                                             <div v-else-if="header.input_type.includes('#')">
@@ -350,6 +427,15 @@
                                                         </div>
                                                         <div v-else-if="header.input_type === 'Longtext'">
                                                             <label class="fw-bold">{{ header.field_description }}</label>
+                                                            <!-- <Editor
+                                                            :name="header.field_name"
+                                                            api-key="no-api-key"
+                                                                :init="{
+                                                                    menubar: false,
+                                                                    plugins: 'code emoticons preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link codesample charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars',
+                                                                    toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | code | emoticons |',
+                                                                }">
+                                                            </Editor> -->
                                                             <textarea class="form-control" :name="header.field_name" type="number" :placeholder="header.field_description" :required="header.required == 'required'"></textarea>
                                                         </div>
                                                         <div v-else-if="header.input_type === 'Yes/No'">
@@ -401,6 +487,17 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <!-- <input class="form-control" :name="header.field_name" type="text" :placeholder="header.field_description"> -->
+                                                    <!-- <div v-if="table_name.use_customer == '1'">
+                                                        <div v-for="rel,index in data" :key="index">
+                                                            <div v-if="index == 'parent'">
+                                                                <label class="fw-bold">{{ header.field_description }}</label>
+                                                                <select class="form-control" :name="header.field_name" :required="header.required == 'required'">
+                                                                    <option v-for="option in rel" :value="option.id">{{option.customer_name}}</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div> -->
                                                 </div>
                                                 <div v-if="status_report == '1'">
                                                         <label class="fw-bold">Status</label>
@@ -487,24 +584,17 @@ import { Head, Link } from '@inertiajs/inertia-vue3';
 
 import { Inertia } from '@inertiajs/inertia';
 
-import { onMounted, reactive, ref } from 'vue';
-
 import Editor from '@tinymce/tinymce-vue';
-
-import pagination from 'laravel-vue-pagination/src/Bootstrap5Pagination'
 
 import Swal from 'sweetalert2';
 
-import axios from 'axios';
-
-export default  {
+export default {
     layout: LayoutApp,
 
     components: {
             Head,
             Link,
-            Editor,
-            pagination,
+            Editor
         },
 
     props: {
@@ -523,7 +613,6 @@ export default  {
         relate: String,
         forms:Object,
         csrfToken: String,
-        userID: String,
         parentData: Array,
         child_data: Array,
         checklist_data: Object,
@@ -531,14 +620,9 @@ export default  {
         select_status: Array,
         users: Array,
         data: Array,
-        auth: Object,
     },
 
     data: () => ({
-        user_id : '',
-        columns : '',
-        rows : '',
-        search: '',
         selectedUser: '',
         sel:[],
         selected:[],
@@ -550,55 +634,104 @@ export default  {
         assignSelector: -1,
         selectedAssign: -1,
         create_ticket : false,
-        table_heads : [],
-        table_heads_use : [],
-        table_content : [],
-        table_data : [],
     }),
-
-    created: function(){
-        // console.log(this.$session)
-        // console.log(this.user_id);
-        this.user_id = this.userID;
-        this.TableHeader();
-        // this.TableContents();
-        this.fillTableHeadUse();
-        this.getFormData()
-        // this.table_data = getFormData;
-    },
 
     methods: {
         copy(id){
+            var UrlOrigin = window.location.origin;
+            let parent_data = [];
+            let parent = [];
             let clipboard_val = '';
+            let data = '';
+            let parent_key = '';
             for(let j = 0 ; j < this.forms.length ; j++) {
                 let datas = this.forms[j];
-                if(datas.index_id == id){
-                    if(this.table_name.extend == '1'){
-                        clipboard_val += '#ID : '+datas.index_id+'\n';
-                    }
+                if(datas.id == id){
                     for(let i = 0 ; i < this.headers.length ; i++) {
                         let header = this.headers[i];
-                        if(header.can_copy == '1'){
-                            if(header.input_type == 'Today Date'){
-                                clipboard_val += header.field_description + ' : '+header.created_at+'\n';
-                            }
-                            else if(header.input_type == 'Longtext'){
-                                clipboard_val += header.field_description + ' :\n'+datas[header.field_name]+'\n';
-                            }
-                            else if(header.input_type == 'File'){
-                                var UrlOrigin = window.location.origin;
-                                var filename = datas[header.field_name];
-                                if(filename){
-                                    clipboard_val += header.field_description + ' : '+UrlOrigin+'/storage/'+filename+'\n';
+                        if(header.input_type.split('#')[0] === 'Parent'){
+                            parent_key = Object.keys(this.parentData)[0];
+                            parent_data = this.parentData[parent_key]
+                            if(header.relate_to.split('#')[0] == parent_key){
+                                for(let k = 0; k < parent_data.length; k++){
+                                    parent = parent_data[k];
+                                    if(parent.id == datas[header.field_name]){
+                                        clipboard_val += header.field_description + ' : '+parent[header.relate_to.split('#')[1]]+'\n';
+                                    }
                                 }
                             }
-                            else{
+                        }
+                        else if(header.input_type.split('#')[0] === 'Child'){
+                            for(let l = 0; l < this.child_data.length; l++){
+                                let child = this.child_data[l]
+                                if(datas[header.field_name] == child.id){
+                                    clipboard_val += header.field_description + ' : '+child[header.relate_to.split('#')[1]]+'\n';
+                                }
+                            }
+                        }
+                        else if(header.relation === '1'){
+                            let sel = '';
+                            parent_key = Object.keys(this.related);
+                            for(let p=0;p < parent_key.length;p++){
+                                let key = parent_key[p]
+                                if(header.relate_to == key){
+                                    let data = this.related[key]
+                                    for(let q = 0; q < data.length;q++){
+                                        let rel = data[q]
+                                        if(rel.id == datas[header.field_name]){
+                                            for(let r = 0; r < this.relation.length; r++){
+                                                sel = this.relation[r]
+                                                if(sel.relation_id == header.relate_to){
+                                                    clipboard_val += header.field_description + ' : '+rel[sel.refer_to]+'\n';
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else if(header.input_type == 'Today Date'){
+                            clipboard_val += header.field_description + ' : '+header.created_at+'\n';
+                        }
+                        else if(header.input_type == 'Longtext'){
+                            clipboard_val += header.field_description + ' :\n'+datas[header.field_name]+'\n';
+                        }
+                        else if(header.input_type == 'File'){
+                            if(datas[header.field_name]){
+                                clipboard_val += header.field_description + ' : '+UrlOrigin+'/storage/'+datas[header.field_name]+'\n';
+                            }
+                        }
+                        else{
+                            if(header.relate_to){
+                                if(header.relate_to == 'Customers#Parent'){
+                                    let parents_data = this.data['parent']
+                                    for(let m = 0; m < parents_data.length; m++){
+                                        let parent = parents_data[m]
+                                        if(datas[header.field_name] == parent.id){
+                                            clipboard_val += header.field_description + ' : '+parent.customer_name+'\n';
+                                        }
+                                    }
+                                }else if(header.relate_to == 'Customers#Child'){
+                                    let child_data = this.data['child']
+                                    for(let n = 0; n < child_data.length; n++){
+                                        let child = child_data[n]
+                                        if(datas[header.field_name] == child.id){
+                                            clipboard_val += header.field_description + ' : '+child.customer_branch+'\n';
+                                        }
+                                    }
+                                }
+                            }else{
                                 clipboard_val += header.field_description + ' : '+datas[header.field_name]+'\n';
                             }
                         }
                     }
                     if(this.table_name.status == '1'){
-                        clipboard_val += 'Status : '+datas.status_report+'\n';
+                        // for(let o = 0;o < this.select_status.length; o++){
+                        //     let status = this.select_status[o]
+                        //     if(datas.status == status.id){
+                                clipboard_val += 'Status : '+datas.status_report+'\n';
+                        //     }
+                        // }
                     }
                 }
             }
@@ -617,7 +750,6 @@ export default  {
             tmpTextField.setSelectionRange(0, 99999) /*For mobile devices*/
             document.execCommand("copy")
             tmpTextField.remove()
-            this.hasCopied()
         },
 
         currentDate() {
@@ -638,7 +770,7 @@ export default  {
             if(!this.customerIds) {
                 this.customerIds = -1;
             }
-            // console.log(this.customerIds)
+            console.log(this.customerIds)
         },
 
         onChangeAssign() {
@@ -661,6 +793,7 @@ export default  {
                 }
                 if(structures.relation == '1'){
                     this.sel[structures.field_name] = form[structures.field_name];
+                    console.log(this.selected);
                 }
             }
         },
@@ -674,135 +807,6 @@ export default  {
 
         showImage() {
             return "/storage/";
-        },
-
-        TableHeader(){
-            if(this.table_name.extend == '1'){
-                this.table_heads.push({
-                    value : "index_id",name : "#ID",type: "Text"
-                });
-            }
-            for(let i = 0 ; i < this.headers.length ; i++) {
-                let structures = this.headers[i];
-                let value = structures.field_name;
-                let name = structures.field_description;
-                let type = structures.input_type;
-                this.table_heads.push({value,name,type});
-            }
-            if(this.table_name.status == '1'){
-                this.table_heads.push({
-                    value : "status_report",name : "Status",type: "Text"
-                });
-            }
-            return this.table_heads
-        },
-
-        fillTableHeadUse() {
-            for(var i = 0; i < this.table_heads.length; i++){
-                let structure = this.table_heads[i];
-                var label = structure.name;
-                var field = structure.value;
-                this.table_heads_use.push({label,field});
-            }
-        },
-
-        // TableContents(){
-        //     var UrlOrigin = window.location.origin;
-        //     let parent_data = [];
-        //     let parent = [];
-        //     let parent_key = '';
-        //     for(let j = 0 ; j < this.forms.length ; j++) {
-        //         let datas = this.forms[j];
-        //             for(let i = 0 ; i < this.headers.length ; i++) {
-        //                 let header = this.headers[i];
-        //                 if(header.input_type.split('#')[0] === 'Parent'){
-        //                     parent_key = Object.keys(this.parentData)[0];
-        //                     parent_data = this.parentData[parent_key]
-        //                     if(header.relate_to.split('#')[0] == parent_key){
-        //                         for(let k = 0; k < parent_data.length; k++){
-        //                             parent = parent_data[k];
-        //                             if(parent.id == datas[header.field_name]){
-        //                                 datas[header.field_name] = parent[header.relate_to.split('#')[1]];
-        //                             }
-        //                         }
-        //                     }
-        //                 }
-        //                 else if(header.input_type.split('#')[0] === 'Child'){
-        //                     for(let l = 0; l < this.child_data.length; l++){
-        //                         let child = this.child_data[l]
-        //                         if(datas[header.field_name] == child.id){
-        //                             datas[header.field_name] = child[header.relate_to.split('#')[1]];
-        //                         }
-        //                     }
-        //                 }
-        //                 else if(header.relation === '1'){
-        //                     let sel = '';
-        //                     parent_key = Object.keys(this.related);
-        //                     for(let p=0;p < parent_key.length;p++){
-        //                         let key = parent_key[p]
-        //                         if(header.relate_to == key){
-        //                             let data = this.related[key]
-        //                             for(let q = 0; q < data.length;q++){
-        //                                 let rel = data[q]
-        //                                 if(rel.id == datas[header.field_name]){
-        //                                     for(let r = 0; r < this.relation.length; r++){
-        //                                         sel = this.relation[r]
-        //                                         if(sel.relation_id == header.relate_to){
-        //                                             datas[header.field_name] = rel[sel.refer_to];
-        //                                         }
-        //                                     }
-        //                                 }
-        //                             }
-        //                         }
-        //                     }
-        //                 }
-        //                 else if(header.input_type == 'Today Date'){
-        //                     datas[header.field_name] = header.created_at;
-        //                 }
-        //                 else if(header.input_type == 'Longtext'){
-        //                     datas[header.field_name] = datas[header.field_name];
-        //                 }
-        //                 else if(header.input_type == 'File'){
-        //                     if(datas[header.field_name]){
-        //                         datas[header.field_name] = '<a href="'+UrlOrigin+'/storage/'+datas[header.field_name]+'" target="blank">'+datas[header.field_name].substring(datas[header.field_name].length-15,datas[header.field_name].length)+'</a>';
-        //                     }
-        //                 }
-        //                 else{
-        //                     if(header.relate_to){
-        //                         if(header.relate_to == 'Customers#Parent'){
-        //                             let parents_data = this.data['parent']
-        //                             for(let m = 0; m < parents_data.length; m++){
-        //                                 let parent = parents_data[m]
-        //                                 if(datas[header.field_name] == parent.id){
-        //                                     datas[header.field_name] = parent.customer_name;
-        //                                 }
-        //                             }
-        //                         }else if(header.relate_to == 'Customers#Child'){
-        //                             let child_data = this.data['child']
-        //                             for(let n = 0; n < child_data.length; n++){
-        //                                 let child = child_data[n]
-        //                                 if(datas[header.field_name] == child.id){
-        //                                     datas[header.field_name] = child.customer_branch;
-        //                                 }
-        //                             }
-        //                         }
-        //                     }else{
-        //                         datas[header.field_name] = datas[header.field_name];
-        //                     }
-        //                 }
-        //             }
-        //         this.table_content.push(datas);
-        //     }
-        //     return this.table_content
-        // },
-    },
-
-    watch:{
-        paginate: function(value){
-            this.getFormData();
-        },
-        search: function(value){
-            this.getFormData();
         },
     },
 
@@ -827,7 +831,7 @@ export default  {
                 filteredsubChains.push(structures);
             }
         }
-        // console.log(filteredsubChains)
+        console.log(filteredsubChains)
         return filteredsubChains;
         },
 
@@ -849,42 +853,6 @@ export default  {
     },
 
     setup() {
-        var UrlOrigin = window.location.origin;
-        var fullPath = window.location.pathname;
-        var path = fullPath.split('/')[4];
-        function getFormData(page = 1) {
-            axios.get(UrlOrigin+`/api/`+path+`/dynamic_table/`+this.user_id+'/?page='+ page
-                + '&per_page=1000000000'
-                + '&q=' + this.search).then(response => {
-                this.table_data = response.data.data.forms;
-            }).catch(error => {
-                    console.log(error.response.data)
-                })  ;
-        }
-
-        const hasCopied = () => {
-            Toast.fire({
-                icon: 'success',
-                title: 'Data Has Copied'
-            })
-        }
-
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-        })
-
-        const getColumn = () => {
-            this.columns = this.table_heads_use
-        }
-
         const destroy = (id,table) => {
             Swal.fire({
                 title: 'Are you sure?',
@@ -912,11 +880,7 @@ export default  {
         }
 
         return {
-            // formData,
-            getFormData,
-            destroy,
-            getColumn,
-            hasCopied
+            destroy
         }
     }
 }

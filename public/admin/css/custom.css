@@ -2,6 +2,7 @@ body {
     /* background-color: #bccad8 !important; */
     background-color: #e5e5e5 !important;
     font-family: 'Quicksand', sans-serif !important;
+    font-size: 12px;
 }
 
 .shadow {
@@ -15,6 +16,7 @@ body {
 .btn-primary {
     background-color: #894b9d !important;
     border-color: #894b9d !important;
+    font-size: 14px;
 }
 
 .btn-primary:hover {
