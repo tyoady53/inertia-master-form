@@ -17,6 +17,8 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use ParagonIE\ConstantTime\Hex;
+use PHPUnit\TextUI\Help;
 
 class TicketsController extends Controller
 {
@@ -65,7 +67,6 @@ class TicketsController extends Controller
 
     public function store(Request $request)
     {
-        dd($request);
         $this->validate($request, [
             'department_id' => 'required',
             'assign_id' => 'required',
@@ -85,12 +86,11 @@ class TicketsController extends Controller
                 $generated = date("ym").'0001';
             }else{
                 $generated = $last_data->thread_id+1;
+
             }
         } else {
             $generated = date("ym").'0001';
         }
-
-        // dd($generated);
             // $file_upload = $request->file('file_upload');
             // $file_upload->storeAs('public/helpdesk', $file_upload->hashName());
 
@@ -115,12 +115,12 @@ class TicketsController extends Controller
             'analyzer_name' => $request->analyzer_name,
             'hid'           => $request->hid,
             'cable_length'  => $request->cable_length,
-            'additional_com'=> $request->additional_com,
+            'additional_com'    => $request->additional_com,
             'reason_reg'    => $request->reason_request,
             'tag_module_id' => $request->tag_module_id,
             'cis_menu_id'   => $request->cis_menu_id,
             'lis_menu_app'  => $request->lis_menu_app,
-            'reg_report_type' => $request->reg_report_type,
+            'reg_report_type'   => $request->reg_report_type,
             'report_id'     => $request->report_id,
             'report_name'   => $request->report_name,
             'pkg'           => $request->pkg,
@@ -130,12 +130,6 @@ class TicketsController extends Controller
             'data_display'  => $request->data_display,
             // 'file_upload'   => $file_upload->hashName()
         ]);
-        // dd($helpdesk);
-
-        // if($helpdesk) {
-            
-        // }
-
 
         if($request->hasFile('image')) {
 
@@ -151,40 +145,15 @@ class TicketsController extends Controller
                 ]);
             }
         }
-        
-
-        // $sla_hours = Sla_plan::where('id', $request->sla_id)->first();
-        // $last_data = Helpdesk::latest('created_at')->first();
-        // if($last_data){
-        //     if(substr($last_data->thread_id,0,5)==date("ym")){
-        //         $generated = date("ym").'0001';
-        //     }else{
-        //         $generated = $last_data->thread_id+1;
-        //     }
-        // } else {
-        //     $generated = date("ym").'0001';
-        // }
-        Helpdesk_thread::create([
-            'helpdesk_id'    => $helpdesk->thread_id,
-            'title'         => 'System',
-            'description'   => '',
-            'assign_id'     => '1',
-            'created_by'    => $request->assign_id
-        ]);
+            Helpdesk_thread::create([
+                'heldesk_id'    => $generated,
+                'title'         => 'System',
+                'description'   => '',
+                'assign_id'     => '1',
+                'created_by'    => $request->assign_id
+            ]);
 
         return redirect()->route('apps.master.tickets.index');
-    }
-
-    public function upload(Request $request){
-        $file_upload = $request->file('file_upload');
-        $upload = $file_upload->storeAs('public/helpdesk', $file_upload->hashName());
-        if($upload){
-            return response()->json([
-                'success'   => true,
-                'message'   => 'Upload Success',
-                'data'      => $upload
-            ]);
-        }
     }
 
     public function getDepartments()
@@ -275,7 +244,7 @@ class TicketsController extends Controller
 
                 $helpdesk_thread->files()->create([
                     'image' => $file->hashName(),
-                    'file_upload_id' => $helpdesk_thread->id
+                    'file_upload_id' => $helpdesk_thread->id 
                 ]);
             }
         }
@@ -291,7 +260,7 @@ class TicketsController extends Controller
         // dd($request);
         $sla_hour = Sla_plan::where('id', $request->id)->first();
         $time = Carbon::now()->addHours($sla_hour->sla_hour);
-
+        
         return response()->json([
             'success'   => true,
             'message'   => 'Time SLA Time :'.$sla_hour->sla_hour.' Hours(s)',
