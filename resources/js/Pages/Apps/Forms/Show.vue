@@ -25,15 +25,9 @@
                                     </div>
                                 </form>
                                 <div style="overflow-x:auto;">
-                                    <!-- <DynamicTable/> -->
-                                    <vue-good-table
-                                        :columns="columns"
-                                        :rows="forms"
-                                    ></vue-good-table>
-                                    <!-- {{ table_heads_use }} -->
                                     <table class="table table-striped table-bordered table-hover">
                                         <thead>
-                                            <th class="text-center" v-if="extend == '1'"  style="width:130px;"> #ID </th>
+                                            <th class="text-center" v-if="extend == '1'"  style="width:150px;"> #ID </th>
                                             <th class="text-center" v-for="header in headers" :key="header"> {{ header.field_description }}</th>
                                             <th class="text-center" v-if="status_report == '1'">Status</th>
                                             <th class="text-center" v-if="extend == '1'"> Action </th>
@@ -53,7 +47,7 @@
                                                 </template>
                                                 <template v-else>
                                                     <td v-for="header in table_heads">
-                                                        <div v-if="header.value=='index_id'">
+                                                        <div v-if="header.value=='index_id'" class="text-center">
                                                             <Link :href="`/apps/master/forms/${table}/extend/${form.index_id}`" v-if="form.index_id" class="btn btn-success btn-sm me-2"><i class="fa fa-expand"></i> {{ form.index_id }}</Link>
                                                         </div>
                                                         <div v-else>
@@ -84,31 +78,26 @@
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <div class="row mt-4">
-                                        <div class="col-sm-6 offset-5">
-                                            <pagination :data="table_data" @pagination-change-page="getFormData"></pagination>
-                                        </div>
+                                    <div style="margin-start: 10px;">
+                                        <pagination :data="table_data" @pagination-change-page="getFormData"></pagination>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                         <!-- The Modal Add Colum -->
-                        <div class="modal" id="addModal">
+                        <!-- <div class="modal" id="addModal">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
 
-                                    <!-- Modal Header -->
                                     <div class="modal-header">
                                         <h4 class="modal-title">Add Column : {{ table_name.description }}</h4>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
 
-                                    <!-- Modal body -->
                                     <div class="modal-body">
                                         <form action="/apps/master/forms/add_column" method="POST">
                                             <input class="form-control" :value="table" type="hidden" name="table">
-                                            <input type="hidden" name="_token" :value="csrf">
+                                            <input type="hidden" name="_token" :value="csrfToken">
                                             <div class="mb-3">
                                                 <label class="fw-bold">Name Column</label>
                                                 <input class="form-control" type="text" name="name" placeholder="Name Column">
@@ -123,18 +112,16 @@
                                                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                                             </div>
                                         </form>
-                                    </div>
-                                    <!-- Modal footer -->
+                                    </div>]
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <!-- End of Modal Add Column -->
 
                         <!-- The Modal Add Data [NEW]-->
                         <div class="modal" id="add_dataModal" ref="add_dataModal">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
-
                                     <!-- Modal Header -->
                                     <div class="modal-header">
                                         <h4 class="modal-title">Add Data : {{ table_name.description }}</h4>
@@ -227,14 +214,14 @@
                                                         <div v-else>
                                                             <div v-if="header.input_type === 'Text'">
                                                                 <div v-if="header.relate_to == 'Customers#Parent'">
-                                                                    <label class="fw-bold">{{ header.field_description }}</label>{{ index }}
+                                                                    <label class="fw-bold">{{ header.field_description }}</label>
                                                                     <select class="form-control" :name="header.field_name" v-model="customerIds" @change="customer_change" :required="header.required == 'required'">
                                                                         <option v-for="option in data[['parent']]" :value="option.id">{{option.customer_name}}</option>
                                                                     </select>
                                                                 </div>
                                                                 <div v-else-if="header.relate_to == 'Customers#Child'">
                                                                     <label class="fw-bold">{{ header.field_description }}</label>
-                                                                    <select class="form-control" :name="header.field_name" v-model="selectedCustomerIds">
+                                                                    <select class="form-control" :name="header.field_name" v-model="selectedCustomerIds" >
                                                                         <option v-for="option in filteredCustomer" :value="option.id">{{option.customer_branch}}</option>
                                                                     </select>
                                                                 </div>
@@ -296,19 +283,19 @@
                                                                     <div v-for="parent,index in parentData">
                                                                         <div v-if="header.relate_to.split('#')[0] == index">
                                                                             <label class="fw-bold">{{ header.field_description }}</label>
-                                                                            <select class="form-control" :name="header.field_name" v-model="selectedChainIds" @change="onChangeChain(header.input_type.split('#')[1])" :required="header.required == 'required'">
+                                                                            <select class="form-control" :name="header.field_name" v-model="selectedChainIds" @change="onChangeChain(header.input_type)" :required="header.required == 'required'">
                                                                                 <option v-for="p in parent" :value="p.id">{{ p[header.relate_to.split('#')[1]] }}</option>
                                                                             </select>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                                 <div v-else-if="header.input_type.split('#')[0] === 'Child'">
-                                                                    <div  v-if="filteredChain.length">
+                                                                    <!-- <div  v-if="filteredChain.length"> -->
                                                                         <label class="fw-bold">{{ header.field_description }}</label>
                                                                         <select class="form-control" :name="header.field_name" v-model="selectedSubChainIds" :required="header.required == 'required'">
                                                                             <option v-for="chain in filteredChain" :value="chain.id">{{ chain[header.relate_to.split('#')[1]] }}</option>
                                                                         </select>
-                                                                    </div>
+                                                                    <!-- </div> -->
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -323,7 +310,7 @@
                                                             </div>
                                                             <div v-else-if="header.relate_to == 'Customers#Child'">
                                                                 <label class="fw-bold">{{ header.field_description }}</label>
-                                                                <select class="form-control" :name="header.field_name" v-model="selectedCustomerIds">
+                                                                <select class="form-control" :name="header.field_name" v-model="selectedCustomerIds" :required="header.required == 'required'">
                                                                     <option v-for="option in filteredCustomer" :value="option.id">{{option.customer_branch}}</option>
                                                                 </select>
                                                             </div>
@@ -385,19 +372,19 @@
                                                                 <div v-for="parent,index in parentData">
                                                                     <div v-if="header.relate_to.split('#')[0] == index">
                                                                         <label class="fw-bold">{{ header.field_description }}</label>
-                                                                        <select class="form-control" :name="header.field_name" v-model="selectedChainIds" @change="onChangeChain(header.input_type.split('#')[1])" :required="header.required == 'required'">
+                                                                        <select class="form-control" :name="header.field_name" v-model="selectedChainIds" @change="onChangeChain(header.input_type)" :required="header.required == 'required'">
                                                                             <option v-for="p in parent" :value="p.id">{{ p[header.relate_to.split('#')[1]] }}</option>
                                                                         </select>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                             <div v-else-if="header.input_type.split('#')[0] === 'Child'">
-                                                                <div  v-if="filteredChain.length">
+                                                                <!-- <div  v-if="filteredChain.length"> -->
                                                                     <label class="fw-bold">{{ header.field_description }}</label>
                                                                     <select class="form-control" :name="header.field_name" v-model="selectedSubChainIds" :required="header.required == 'required'">
                                                                         <option v-for="chain in filteredChain" :value="chain.id">{{ chain[header.relate_to.split('#')[1]] }}</option>
                                                                     </select>
-                                                                </div>
+                                                                <!-- </div> -->
                                                             </div>
                                                         </div>
                                                     </div>
@@ -455,7 +442,7 @@
                                     <!-- Modal body -->
                                     <div class="modal-body">
                                         <form action="/apps/master/forms/update_data" method="POST">
-                                            <input type="hidden" name="_token" :value="csrf">
+                                            <input type="hidden" name="_token" :value="csrfToken">
                                             <input class="form-control" name="table" :value="table" type="hidden">
                                             <input class="form-control" name="data_id" :value="selectedUser.id" type="hidden">
                                             <div class="mb-3" v-for="header in headers" :key="header">
@@ -487,8 +474,6 @@ import { Head, Link } from '@inertiajs/inertia-vue3';
 
 import { Inertia } from '@inertiajs/inertia';
 
-import { onMounted, reactive, ref } from 'vue';
-
 import Editor from '@tinymce/tinymce-vue';
 
 import pagination from 'laravel-vue-pagination/src/Bootstrap5Pagination'
@@ -513,24 +498,24 @@ export default  {
         today: String,
         status_report: String,
         extend: String,
-        table_name: String,
+        table_name: Object,
         headers: Object,
         create_data: String,
         edit_data: String,
         delete_data: String,
         relation: Array,
-        related: String,
+        related: Object,
         relate: String,
         forms:Object,
         csrfToken: String,
-        userID: String,
+        userID: Number,          // User ID
         parentData: Array,
         child_data: Array,
         checklist_data: Object,
         divisions: Array,
         select_status: Array,
         users: Array,
-        data: Array,
+        data: Object,
         auth: Object,
     },
 
@@ -557,21 +542,32 @@ export default  {
     }),
 
     created: function(){
-        // console.log(this.$session)
-        // console.log(this.user_id);
-        this.user_id = this.userID;
         this.TableHeader();
-        // this.TableContents();
         this.fillTableHeadUse();
         this.getFormData()
-        // this.table_data = getFormData;
     },
 
     methods: {
+        getFormData(page = 1) {
+            var UrlOrigin = window.location.origin;
+            // var fullPath = window.location.pathname;
+            // var path = fullPath.split('/')[4];
+            axios.get(UrlOrigin+`/api/`+this.table_name.name+`/dynamic_table/`+this.userID+'/?page='+ page
+                + '&per_page=20'
+                + '&q=' + this.search
+                ).then(response => {
+                    console.log(this.search)
+                    console.log(response.data.data.forms)
+                this.table_data = response.data.data.forms;
+            }).catch(error => {
+                    console.log(error.response.data)
+                }) ;
+        },
+
         copy(id){
             let clipboard_val = '';
-            for(let j = 0 ; j < this.forms.length ; j++) {
-                let datas = this.forms[j];
+            for(let j = 0 ; j < this.table_data.data.length ; j++) {
+                let datas = this.table_data.data[j];
                 if(datas.index_id == id){
                     if(this.table_name.extend == '1'){
                         clipboard_val += '#ID : '+datas.index_id+'\n';
@@ -593,7 +589,11 @@ export default  {
                                 }
                             }
                             else{
-                                clipboard_val += header.field_description + ' : '+datas[header.field_name]+'\n';
+                                if(datas[header.field_name]){
+                                    clipboard_val += header.field_description + ' : '+datas[header.field_name]+'\n';
+                                } else {
+                                    clipboard_val += header.field_description + ' : -\n';
+                                }
                             }
                         }
                     }
@@ -625,12 +625,14 @@ export default  {
             return current.toLocaleString();
         },
 
-        onChangeChain(reference) {
+        onChangeChain() {
+            // parent = reference.split('#')[1];
             this.selectedSubChainIds = -1;
             if(!this.selectedChainIds) {
                 this.selectedChainIds = -1;
             }
-            parent = reference;
+            console.log(parent)
+            console.log(this.selectedChainIds)
         },
 
         customer_change(){
@@ -638,30 +640,12 @@ export default  {
             if(!this.customerIds) {
                 this.customerIds = -1;
             }
-            // console.log(this.customerIds)
         },
 
         onChangeAssign() {
             this.selectedAssign = -1;
             if(!this.assignSelector) {
                 this.assignSelector = -1;
-            }
-        },
-
-        sendInfo(form) {
-            this.selectedUser = form;
-            for(let i = 0 ; i < this.headers.length ; i++) {
-                let structures = this.headers[i];
-                if(structures.input_type.split('#')[0] == 'Parent') {
-                    this.selectedChainIds = form[structures.field_name];
-                    this.onChangeChain(structures.relate_to.split('#')[1]);
-                }
-                if(structures.input_type.split('#')[0] == 'Child') {
-                    this.selectedSubChainIds = form[structures.field_name];
-                }
-                if(structures.relation == '1'){
-                    this.sel[structures.field_name] = form[structures.field_name];
-                }
             }
         },
 
@@ -688,12 +672,16 @@ export default  {
                 let name = structures.field_description;
                 let type = structures.input_type;
                 this.table_heads.push({value,name,type});
+                if(structures.input_type.split('#')[0] == 'Parent'){
+                    parent = structures.input_type.split('#')[1]
+                }
             }
             if(this.table_name.status == '1'){
                 this.table_heads.push({
                     value : "status_report",name : "Status",type: "Text"
                 });
             }
+            console.log(parent)
             return this.table_heads
         },
 
@@ -808,14 +796,16 @@ export default  {
 
     computed: {
         filteredChain() {
-        let filteredsubChains = [];
-        for(let i = 0 ; i < this.child_data.length ; i++) {
-            let structures = this.child_data[i];
-            if(structures.parent == this.selectedChainIds) {
-                filteredsubChains.push(structures);
+            let filteredsubChains = [];
+            for(let i = 0 ; i < this.child_data.length ; i++) {
+                let structures = this.child_data[i];
+                if(structures[parent] == this.selectedChainIds) {
+                    console.log(structures[parent])
+                    filteredsubChains.push(structures);
+                }
             }
-        }
-        return filteredsubChains;
+            console.log(filteredsubChains)
+            return filteredsubChains;
         },
 
         filteredCustomer() {
@@ -849,37 +839,36 @@ export default  {
     },
 
     setup() {
-        var UrlOrigin = window.location.origin;
-        var fullPath = window.location.pathname;
-        var path = fullPath.split('/')[4];
-        function getFormData(page = 1) {
-            axios.get(UrlOrigin+`/api/`+path+`/dynamic_table/`+this.user_id+'/?page='+ page
-                + '&per_page=1000000000'
-                + '&q=' + this.search).then(response => {
-                this.table_data = response.data.data.forms;
-            }).catch(error => {
-                    console.log(error.response.data)
-                })  ;
-        }
-
         const hasCopied = () => {
-            Toast.fire({
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                title: 'Success!',
+                text: 'Ticket saved successfully.',
                 icon: 'success',
-                title: 'Data Has Copied'
-            })
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
         }
 
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-        })
+        // const Toast = Swal.mixin({
+        //     toast: true,
+        //     position: 'top-end',
+        //     showConfirmButton: false,
+        //     icon: 'success',
+        //     title: 'Data Has Copied',
+        //     timer: 3000,
+        //     timerProgressBar: true,
+        //     didOpen: (toast) => {
+        //         toast.addEventListener('mouseenter', Swal.stopTimer)
+        //         toast.addEventListener('mouseleave', Swal.resumeTimer)
+        //     }
+        // })
 
         const getColumn = () => {
             this.columns = this.table_heads_use
@@ -912,8 +901,6 @@ export default  {
         }
 
         return {
-            // formData,
-            getFormData,
             destroy,
             getColumn,
             hasCopied

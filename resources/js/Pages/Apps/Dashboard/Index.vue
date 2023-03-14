@@ -9,9 +9,8 @@
             <div class="fade-in">
 
                 <div class="row">
-                    <p class="text-black-center"> hello </p>
+                    <p class="text-black-center"> </p>
                 </div>
-                
             </div>
         </div>
     </main>

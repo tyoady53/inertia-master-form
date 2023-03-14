@@ -23,6 +23,7 @@ class CreateMasterTablesTable extends Migration
             $table->string('status',2);
             $table->string('use_customer',2);
             $table->string('use_clipboard',2);
+            $table->string('limit_access',2);
             $table->string('created_by');
             $table->string('updated_by');
             $table->timestamp('created_at')->useCurrent();

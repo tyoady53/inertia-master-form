@@ -23,7 +23,7 @@ createInertiaApp({
 
             let hasPermission = false;
             permissions.forEach(function(item){
-              if(allPermissions[item]) hasPermission = true;     
+              if(allPermissions[item]) hasPermission = true;
             });
 
             return hasPermission;

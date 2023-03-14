@@ -18,6 +18,7 @@ return new class extends Migration
             $table->tinyInteger('table_id');
             $table->unsignedBigInteger('index_id');
             $table->text('description');
+            $table->text('status')->nullable();
             $table->unsignedBigInteger('created_by');
             $table->timestamps();
 

@@ -1,3 +1,50 @@
+<style module>
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  /* border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 500px;
+  background-color: #555;
+  color: #fff;
+  text-align: justify;
+  padding: 5px 10px;
+  margin-left: 70px;
+  border-radius: 6px;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Tooltip arrow */
+.tooltip .tooltiptext::after {
+  content: "";
+    position: absolute;
+    bottom: 85%;
+    left: -5px;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent #555 transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+</style>
 <template>
     <Head>
         <title> Add New Form - Master Form</title>
@@ -20,8 +67,8 @@
                                         <label class="fw-bold">Name Table</label>
                                         <input class="form-control" type="text" v-model="form.table_name" placeholder="Name Table">
                                     </div>
-                                    <div class="row">
-                                        <div class="col-lg-3">&nbsp&nbsp&nbsp&nbsp
+                                    <div class="row ms-3">
+                                        <div class="col-lg-3">
                                             <input class="form-check-input" type="checkbox" v-model="form.extend" id="extend">
                                             <label class="form-check-label" for="extend">Extend</label>
                                         </div>
@@ -38,6 +85,18 @@
                                             <label class="form-check-label" for="clipboard">Use Clipboard</label>
                                         </div>
                                     </div>
+                                    <div class="row ms-3">
+                                        <div>
+                                            <input class="form-check-input" type="checkbox" v-model="form.limited" id="limited">
+                                            <div :class="$style.tooltip">
+                                                <label class="form-check-label" for="limited">Limit Data Access<i class="fa fa-info-circle ms-2"></i></label>
+                                                <span :class="$style.tooltiptext">Pembatasan Akses Data.
+                                                <li class="ms-3">Aktifkan untuk membatasi data yang dapat di akses oleh user. Data yang sudah di input user hanya dapat di akses oleh user yang bersangkutan.</li>
+                                                <li class="ms-3">Matikan batasan akses, untuk membuat data yang sudah di input dapat di akses oleh semua user.</li></span>
+                                            </div>
+
+                                        </div>
+                                    </div>
 
                                     <div class="mb-3">
                                         <label class="fw-bold">Role</label>
@@ -48,7 +107,7 @@
                                             </thead>
                                             <tbody>
                                                 <tr v-for="(role, index) in roles" :key="index">
-                                                    <td>&nbsp&nbsp
+                                                    <td style="padding-left:25px;">
                                                         <input class="form-check-input" type="checkbox" v-model="form.roles" :value="role.name" :id="`check-${role.id}`" @change="check(role)">
                                                         <label class="form-check-label" :for="`check-${role.id}`">{{ role.name }}</label>
                                                     </td>

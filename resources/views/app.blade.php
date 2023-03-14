@@ -15,7 +15,8 @@
     <script src="{{ mix('/js/app.js') }}" defer></script>
     <script src="https://unpkg.com/v-switch-case@1.0.2/dist/v-switch.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.21/vue.js"></script>
-    
+    {{-- <Link rel="icon" href="/images/logowynhealth.png" type="image/x-icon"> --}}
+    <Link rel="icon" href="/images/Wynacom.png" type="image/x-icon">
   </head>
   <body>
     {{-- {{ url() }} --}}

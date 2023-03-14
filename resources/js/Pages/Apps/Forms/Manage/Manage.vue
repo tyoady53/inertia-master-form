@@ -8,8 +8,13 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="card border-0 rounded-3 shadow border-top-purple">
-                            <div class="card-header">
-                                <h5><span class="font-weight-bold"><i class="fa fa-cog"></i> MANAGE :: {{ table_name.description }}</span></h5>
+                            <div class="card-header input-group">
+                                <div class="me-2">
+                                <Link :href="`/apps/master/forms/${table_name.name}/show`"><h5><i class="fa fa-arrow-left"></i></h5></Link>
+                                </div>
+                                <div class="me-2">
+                                    <h5><span class="font-weight-bold"><i class="fa fa-cog"></i> MANAGE :: {{ table_name.description }}</span></h5>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <button data-bs-toggle="modal" data-bs-target="#addFieldModal" class="btn btn-primary btn-sm me-2" type="button">Add Field</button>
@@ -45,7 +50,7 @@
                                     <tbody>
                                         <tr v-for="header in headers">
                                             <td>
-                                                <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editFieldModal" @click="sendInfo(header)"><i class="fa fa-edit"></i></button>
+                                                <!-- <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editFieldModal" @click="sendInfo(header)"><i class="fa fa-edit"></i></button> -->
                                                 {{ header.field_description }}
                                             </td>
                                             <td v-if="header.relation === '0'">
@@ -70,15 +75,11 @@
                                             <td class="text-center">
                                                 <div>
                                                     <div>
-                                                        <button  v-if="header.relation === '0'" class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#relationModal" @click="sendInfo(header)"> <i class="fa fa-link me-1"></i> Add Relation</button>
+                                                        <button v-if="header.relation === '0'" class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#relationModal" @click="sendInfo(header)"> <i class="fa fa-link me-1"></i> Add Relation</button>
+                                                        <button v-if="parent_count == '0'" class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#parentModal" @click="setParent(header)"> <i class="fas fa-code-branch"></i> Set As Parent</button>
                                                         <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editFieldModal" @click="sendInfo(header)"><i class="fa fa-edit"></i></button>
                                                         <button @click.prevent="destroy(header.id)" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> DELETE</button>
                                                     </div>
-                                                    <!-- <div v-if="parent_count == '0'">
-                                                        <button class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#parentModal" @click="setParent(header)"> <i class="fas fa-code-branch"></i> Set As Parent</button>
-                                                        <br>
-                                                        <br>
-                                                    </div> -->
                                                 </div>
                                             </td>
                                         </tr>
